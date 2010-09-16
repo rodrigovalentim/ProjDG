@@ -69,22 +69,22 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         int id = 0;
         this.casas = new Casa[8][8];
 
-        for (int coluna = 0; coluna < casas.length; coluna++) {
-            for (int linha = 0; linha < casas[0].length; linha++) {
+        for (int linha = 0; linha < casas.length; linha++) {
+            for (int coluna = 0; coluna < casas[0].length; coluna++) {
+                if (linha % 2 != 0) {
                 if (coluna % 2 != 0) {
-                    if (linha % 2 != 0) {
-                        casas[coluna][linha] = new Casa(id, Color.gray);
+                        casas[linha][coluna] = new Casa(id, Color.lightGray);
                         id++;
                     } else {
-                        casas[coluna][linha] = new Casa(id, Color.lightGray);
+                        casas[linha][coluna] = new Casa(id, Color.gray);
                         id++;
                     }
                 } else {
-                    if (linha % 2 != 0) {
-                        casas[coluna][linha] = new Casa(id, Color.gray);
+                    if (coluna % 2 != 0) {
+                        casas[linha][coluna] = new Casa(id, Color.gray);
                         id++;
                     } else {
-                        casas[coluna][linha] = new Casa(id, Color.lightGray);
+                        casas[linha][coluna] = new Casa(id, Color.lightGray);
                         id++;
                     }
                 }
@@ -94,7 +94,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
                  *
                  * Adiciona componente (casas -> extend javax.swing.JPanel) ao tabuleiro -> extend JInternalFrame
                  */
-                adicionaComponente(getCasas()[coluna][linha], coluna, linha, 1, 1);
+                adicionaComponente(getCasas()[linha][coluna], linha, coluna, 1, 1);
             }
         }
 
@@ -104,30 +104,31 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     }
 
     public void montaTabuleiroArray() {
-        for (int coluna = 0; coluna < 8; coluna++) {
-            for (int linha = 0; linha < 8; linha++) {
-                if (coluna % 2 == 0) {
-                    if (linha % 2 == 0) {
-                        setDesenhaTabuleiroMatriz(coluna, linha, "@"); //Casas Claras das linhas pares
+
+        for (int linha = 0; linha < casas.length; linha++) {
+            for (int coluna = 0; coluna < casas[0].length; coluna++) {
+                if (linha % 2 != 0) {
+                    if (coluna % 2 != 0) {
+                        setDesenhaTabuleiroMatriz(linha, coluna, "@"); //Casas Claras das linhas pares
                     } else {
-                        setDesenhaTabuleiroMatriz(coluna, linha, "#"); //Casas Escuras das linhas pres
+                        setDesenhaTabuleiroMatriz(linha, coluna, "#"); //Casas Escuras das linhas pres
                     }
                 } else {
-                    if (linha % 2 != 0) {
-                        setDesenhaTabuleiroMatriz(coluna, linha, "@"); //Casas Claras das linhas impares
+                    if (coluna % 2 != 0) {
+                        setDesenhaTabuleiroMatriz(linha, coluna, "#"); //Casas Claras das linhas impares
                     } else {
-                        setDesenhaTabuleiroMatriz(coluna, linha, "#"); //Casas Escuras das linhas impares
+                        setDesenhaTabuleiroMatriz(linha, coluna, "@"); //Casas Escuras das linhas impares
                     }
                 }
                 /*
                  * Casas possiveis de uso (escuras) as configuradas com # para uso posterior
                  */
-                if (getDesenhaTabuleiroMatriz(coluna, linha).equals("#")) {
-                    getCasas()[coluna][linha].setBackground(Color.gray);
-                    getCasas()[coluna][linha].setForeground(Color.gray);
+                if (getDesenhaTabuleiroMatriz(linha, coluna).equals("#")) {
+                    getCasas()[linha][coluna].setBackground(Color.gray);
+                    getCasas()[linha][coluna].setForeground(Color.gray);
                 } else {
-                    getCasas()[coluna][linha].setBackground(Color.lightGray);
-                    getCasas()[coluna][linha].setForeground(Color.lightGray);
+                    getCasas()[linha][coluna].setBackground(Color.lightGray);
+                    getCasas()[linha][coluna].setForeground(Color.lightGray);
                 }
             }
         }
@@ -189,10 +190,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     public void adicionaComponente(Component c, int linha, int coluna, int width, int height) {
         getTabuleiroGBConstraints().gridx = coluna;
         getTabuleiroGBConstraints().gridy = linha;
-
         getTabuleiroGBConstraints().gridwidth = width;
         getTabuleiroGBConstraints().gridheight = height;
-
         getTabuleiroGridBagLayout().setConstraints(c, getTabuleiroGBConstraints());
         getTabuleiroContainer().add(c);
     }
@@ -206,11 +205,25 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     public void move(int colunaOrigem, int linhaOrigem, int colunaDestino, int linhaDestino) {
     }
 
+    private void desmarcaSelecao() {
+        /*
+         * Metodo desativaSelecao - Metodo utilizado para desabilitar a
+         * seleção apos a jogada ou caso selecionado outra pedra
+         */
+        for (int linha = 0; linha < 8; linha++) {
+            for (int coluna = 0; coluna < 8; coluna++) {
+                getCasas()[linha][coluna].setCasaSelecionada(false, Color.red);
+                setxSelecionado(-1);
+                setySelecionado(-1);
+            }
+        }
+    }
+
     public void mouseClicked(MouseEvent e) {
-        int coluna = (e.getX() / (super.getWidth() / 8));
-        int linha = (e.getY() / (super.getHeight() / 8));
-        System.out.println("Clicado -> Coluna " +coluna+" linha "+linha);
-        System.out.println(getDesenhaTabuleiroMatriz(linha, coluna));
+        int y = ((e.getX()) / (super.getWidth() / 8));
+        int x = ((e.getY() - 13) / (super.getHeight() / 8));
+        System.out.println("Clicado -> Coluna ->" + y + " Linha ->" + x);
+        System.out.println(getDesenhaTabuleiroMatriz(x, y));
     }
 
     public void mousePressed(MouseEvent e) {
@@ -228,13 +241,13 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          *
          */
 
-        int coluna = (e.getX() / (super.getWidth() / 8));
-        int linha = (e.getY() / (super.getHeight() / 8));
+        int y = (e.getX()) / (super.getWidth() / 8);
+        int x = (e.getY() - 13) / (super.getHeight() / 8);
 
-        if (!getDesenhaTabuleiroMatriz(linha, coluna).equals("@") && !getDesenhaTabuleiroMatriz(linha, coluna).equals("#")) {
-            getCasas()[linha][coluna].setCasaSelecionada(true, Color.red);
-            setxSelecionado(coluna);
-            setySelecionado(linha);
+        if (!getDesenhaTabuleiroMatriz(x, y).equals("@") && !getDesenhaTabuleiroMatriz(x, y).equals("#")) {
+            getCasas()[x][y].setCasaSelecionada(true, Color.red);
+            setxSelecionado(x);
+            setySelecionado(y);
         }
     }
 
@@ -253,15 +266,15 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     /**
      * @return the tabuleiro
      */
-    public String getDesenhaTabuleiroMatriz(int x, int y) {
-        return tabuleiroMatriz[x][y];
+    public String getDesenhaTabuleiroMatriz(int linha, int coluna) {
+        return tabuleiroMatriz[linha][coluna];
     }
 
     /**
      * @param tabuleiro the tabuleiro to set
      */
-    public void setDesenhaTabuleiroMatriz(int x, int y, String val) {
-        this.tabuleiroMatriz[x][y] = val;
+    public void setDesenhaTabuleiroMatriz(int linha, int coluna, String val) {
+        this.tabuleiroMatriz[linha][coluna] = val;
     }
 
     /**
