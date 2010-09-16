@@ -6,10 +6,14 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
 /*
- * A classe tabuleiro será extendida do InternalFrame, 
- * que fornece muitas caracteristicas de um quadro natural
+ * A classe tabuleiro sera extendida do InternalFrame,
+ * que por ser leve, consome menos recurso, nos atende perfeitamente.
  *
- * Documentacao - http://java.sun.com/docs/books/tutorial/uiswing/components/internalframe.html
+ * Documentacao usada para decidir sobre o InternalFrame
+ * http://java.sun.com/docs/books/tutorial/uiswing/components/internalframe.html
+ *
+ * Foi necessario implementar o mouseListener e o MouseMotionListen
+ *
  */
 public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMotionListener {
 
@@ -205,7 +209,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     public void mouseClicked(MouseEvent e) {
         int coluna = (e.getX() / (super.getWidth() / 8));
         int linha = (e.getY() / (super.getHeight() / 8));
-        System.out.println("Clicado -> " + linha + ", " + coluna);
+        System.out.println("Clicado -> Coluna " +coluna+" linha "+linha);
         System.out.println(getDesenhaTabuleiroMatriz(linha, coluna));
     }
 
