@@ -259,7 +259,16 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         int y = (e.getX()) / (super.getWidth() / 8);
         int x = (e.getY() - valAjuste) / (super.getHeight() / 8);
 
+        /*
+         * remove selecao feita ao clicar na pedra.
+         */
+        this.desmarcaSelecao();
+        
         if (!getDesenhaTabuleiroMatriz(x, y).equals("@") && !getDesenhaTabuleiroMatriz(x, y).equals("#")) {
+            /*
+             * seta como selecionada a casa, pintando sua borda
+             */
+
             getCasas()[x][y].setCasaSelecionada(true, Color.red);
             setxSelecionado(x);
             setySelecionado(y);

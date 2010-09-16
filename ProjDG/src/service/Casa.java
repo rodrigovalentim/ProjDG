@@ -31,17 +31,24 @@ public class Casa extends javax.swing.JPanel {
          */
         super.paintComponent(g);
         /*
-         * fillOval - Preenche uma área oval delimitada pelo retângulo especificado e com a cor atual configurada.
+         * fillOval - Preenche uma area oval delimitada pelo retangulo especificado e com a cor atual configurada.
+         * a cor configurada esta sendo setada a cor da pedra
+         *
+         * os valores 4 e 4, sao usados para alimentar o x e o y
+         * que esta posicionando esta figura da pedra no centro da casa
+         *
+         * os valores subtraidos da altura e largura, foi definido como 8 para nao ficar uma pedra muito grande.
+         *
          */
-        g.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
+        g.fillOval(4, 4, super.getWidth() - 8, super.getHeight() - 8);
 
         /*
-         * isCasaSelecionada - Ao selecionar, será pintado de outra cor
+         * isCasaSelecionada - Ao selecionar, a borda sera pintada de outra cor
          */
         if (isCasaSelecionada()) {
-            layoutCasa.setColor(getCorSelecionado());
-            layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
-            layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
+            this.layoutCasa.setColor(getCorSelecionado());
+            this.layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
+            this.layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
         }
     }
 
@@ -129,7 +136,6 @@ public class Casa extends javax.swing.JPanel {
      * getPreferredSize - retorna o tamanho "preferido" do componente.
      * e o mesmo vem do componenteUI
      */
-
     public Dimension getPreferredSize() {
         return new Dimension(50, 50);
     }
