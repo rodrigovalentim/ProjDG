@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import model.Pedra;
 import service.Jogador;
 import service.Peca;
+import service.Placar;
 import service.Tabuleiro;
 
 public class Jogo extends JFrame {
@@ -22,6 +23,7 @@ public class Jogo extends JFrame {
     private static Jogador jogador1, jogador2;
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
+    private Placar placar;
     private ArrayList<Pedra> pedrasCapturadas;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
@@ -51,11 +53,12 @@ public class Jogo extends JFrame {
         jogadores[0].setId(0); //Setando id do jogador 1
         jogadores[1] = jogador2; //atribindo valores ao jogador 2
         jogadores[1].setId(1); //Setando id do jogador 2
-
+        placar = new Placar(jogador1, jogador2);
         distribuirPedras();
         posicionarPedras(jogador1);
         posicionarPedras(jogador2);
         getTabuleiro().mostra(guiDamas);
+        getPlacar().mostra(guiDamas);
         /*
          * Inicializando Variaveis
          */
@@ -69,7 +72,7 @@ public class Jogo extends JFrame {
         jogador1 = new Jogador("Rodrigo");
         jogador2 = new Jogador("PC");
         Jogo mainFrame = new Jogo(jogador1, jogador2);
-        mainFrame.setSize(640, 480);
+        mainFrame.setSize(610, 432);
         mainFrame.setVisible(true);
     }
 
@@ -182,5 +185,19 @@ public class Jogo extends JFrame {
      */
     public void setJogadores(Jogador[] jogadores) {
         this.jogadores = jogadores;
+    }
+
+    /**
+     * @return the placar
+     */
+    public Placar getPlacar() {
+        return placar;
+    }
+
+    /**
+     * @param placar the placar to set
+     */
+    public void setPlacar(Placar placar) {
+        this.placar = placar;
     }
 }
