@@ -25,6 +25,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     private String jogadorDaVez;
     private int xSelecionado;
     private int ySelecionado;
+    private static final int valAjuste = 20;
 
     public Tabuleiro() {
         /*
@@ -220,8 +221,11 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     }
 
     public void mouseClicked(MouseEvent e) {
+        /*
+         * Testes de X e Y. 
+         */
         int y = ((e.getX()) / (super.getWidth() / 8));
-        int x = ((e.getY() - 13) / (super.getHeight() / 8));
+        int x = ((e.getY() - valAjuste) / (super.getHeight() / 8));
         System.out.println("Clicado -> Coluna ->" + y + " Linha ->" + x);
         System.out.println(getDesenhaTabuleiroMatriz(x, y));
     }
@@ -237,12 +241,23 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          *
          * super.getHeight serve para pegar a altura do componente
          *
-         * A divisão por 8 e necessaria por que temos 8 casas
+         * A divisao por 8 e necessaria por que temos 8 casas
+         *
+         * Y esta recebendo x e X esta recebendo Y por que o mouseEvent interte isso, pra nos ajudar, claro.
+         * Atraves destes testes, leitura de documentacoes
+         * http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/MouseEvent.html
+         * indentificamos que o MouseEvent retorna X como sendo linha e o Y como sendo coluna.
+         * Invertendo as posicoes, tudo se resolveu.
+         *
+         *
+         * O valor de ajuste igual a 20, quando subtraido da linha, temos uma maior precisao
+         * no calculo nos possibilitando clicar bem proximo da borda da casa sem que ele pegue
+         * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
          *
          */
 
         int y = (e.getX()) / (super.getWidth() / 8);
-        int x = (e.getY() - 13) / (super.getHeight() / 8);
+        int x = (e.getY() - valAjuste) / (super.getHeight() / 8);
 
         if (!getDesenhaTabuleiroMatriz(x, y).equals("@") && !getDesenhaTabuleiroMatriz(x, y).equals("#")) {
             getCasas()[x][y].setCasaSelecionada(true, Color.red);
