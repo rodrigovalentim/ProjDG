@@ -25,7 +25,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     private String jogadorDaVez;
     private int xSelecionado;
     private int ySelecionado;
-    private static final int valAjuste = 20;
+    private static final int valAjuste = 10;
 
     public Tabuleiro() {
         /*

@@ -25,7 +25,7 @@ public class Casa extends javax.swing.JPanel {
     }
 
     public void paintComponent(Graphics g) {
-        this.layoutCasa = g;
+        layoutCasa = g;
         /*
          * super.paintComponent(g);  - chamando construtor do JPanel, swing lhe ajuda a desenhar a tela
          */
@@ -34,21 +34,21 @@ public class Casa extends javax.swing.JPanel {
          * fillOval - Preenche uma area oval delimitada pelo retangulo especificado e com a cor atual configurada.
          * a cor configurada esta sendo setada a cor da pedra
          *
-         * os valores 4 e 4, sao usados para alimentar o x e o y
+         * os valores 5 e 5, sao usados para alimentar o x e o y
          * que esta posicionando esta figura da pedra no centro da casa
          *
-         * os valores subtraidos da altura e largura, foi definido como 8 para nao ficar uma pedra muito grande.
+         * os valores subtraidos da altura e largura, foi definido como 10 para nao ficar uma pedra muito grande.
          *
          */
-        g.fillOval(4, 4, super.getWidth() - 8, super.getHeight() - 8);
+        g.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
 
         /*
          * isCasaSelecionada - Ao selecionar, a borda sera pintada de outra cor
          */
         if (isCasaSelecionada()) {
-            this.layoutCasa.setColor(getCorSelecionado());
-            this.layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
-            this.layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
+            layoutCasa.setColor(getCorSelecionado());
+            layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
+            layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
         }
     }
 
