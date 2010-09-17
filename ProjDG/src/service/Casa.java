@@ -6,25 +6,23 @@ import java.awt.Graphics;
 import model.Pedra;
 
 public class Casa extends javax.swing.JPanel {
-
     private int id;
     private Color corCasaSelecionada; //cor quando selecionado
-    private Color corPedra; //cor da pedra
+    private boolean casaPossivel;
     private Color corMovimentosPossiveis; //cor dos movimentos possiveis
     private Pedra pedra; //pedra
     private boolean casaSelecionada; //indica casa selecionada
     private boolean movimentoPossivel;
     private Graphics layoutCasa; //layout da casa
 
-    public Casa(int id, Color cor) {
+    public Casa(int id, Color cor, boolean possivel) {
         setId(id);
-        setCor(cor);
-        retiraPedra(); //casa comeca sem pedra nenhuma
         setCasaSelecionada(false, null);
         setLayoutCasa(null);
         this.setBackground(cor);
         this.setForeground(cor);
         setMovimentoPossivel(false, null);
+        setCasaPossivel(possivel);
     }
 
     public void paintComponent(Graphics g) {
@@ -64,14 +62,9 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
             layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
-    }
-
-    public Color getCor() {
-        return this.corPedra;
-    }
-
-    public void setCor(Color cor) {
-        this.corPedra = cor;
+        if (getPedra() != null) {
+            setForeground(getPedra().getCor());
+        }
     }
 
     public int getId() {
@@ -189,5 +182,19 @@ public class Casa extends javax.swing.JPanel {
      */
     public void setCorPossivel(Color c) {
         this.corMovimentosPossiveis = c;
+    }
+
+    /**
+     * @return the possivel
+     */
+    public boolean isCasaPossivel() {
+        return casaPossivel;
+    }
+
+    /**
+     * @param possivel the possivel to set
+     */
+    public void setCasaPossivel(boolean possivel) {
+        this.casaPossivel = possivel;
     }
 }

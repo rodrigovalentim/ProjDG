@@ -18,13 +18,12 @@ import javax.swing.JInternalFrame;
 public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMotionListener {
 
     private Casa[][] casas;
-    private String tabuleiroMatriz[][] = new String[8][8];
     private Container tabuleiroContainer;
     private GridBagLayout tabuleiroGridBagLayout;
     private GridBagConstraints tabuleiroGBConstraints;
     private Color corCasaClara;
     private Color corCasaEscura;
-    private String jogadorDaVez;
+    private int jogadorDaVez;
     private int xSelecionado;
     private int ySelecionado;
     private static final int valAjuste = 10;
@@ -82,18 +81,18 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
             for (int coluna = 0; coluna < casas[0].length; coluna++) {
                 if (linha % 2 != 0) {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(id, getCorCasaClara());
+                        casas[linha][coluna] = new Casa(id, getCorCasaClara(), false);
                         id++;
                     } else {
-                        casas[linha][coluna] = new Casa(id, getCorCasaEscura());
+                        casas[linha][coluna] = new Casa(id, getCorCasaEscura(), true);
                         id++;
                     }
                 } else {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(id, getCorCasaEscura());
+                        casas[linha][coluna] = new Casa(id, getCorCasaEscura(), true);
                         id++;
                     } else {
-                        casas[linha][coluna] = new Casa(id, getCorCasaClara());
+                        casas[linha][coluna] = new Casa(id, getCorCasaClara(), false);
                         id++;
                     }
                 }
@@ -106,98 +105,79 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
                 adicionaComponente(getCasas()[linha][coluna], linha, coluna, 1, 1);
             }
         }
-
-        setJogadorDaVez("0");
-        montaTabuleiroArray();
+        setJogadorDaVez(0);
         setTitle("Tabuleiro");
         setSize(700, 670);
     }
 
-    public void montaTabuleiroArray() {
-
-        for (int linha = 0; linha < casas.length; linha++) {
-            for (int coluna = 0; coluna < casas[0].length; coluna++) {
-                if (linha % 2 != 0) {
-                    if (coluna % 2 != 0) {
-                        setDesenhaTabuleiroMatriz(linha, coluna, "@"); //Casas Claras das linhas pares
-                    } else {
-                        setDesenhaTabuleiroMatriz(linha, coluna, "#"); //Casas Escuras das linhas pres
-                    }
-                } else {
-                    if (coluna % 2 != 0) {
-                        setDesenhaTabuleiroMatriz(linha, coluna, "#"); //Casas Claras das linhas impares
-                    } else {
-                        setDesenhaTabuleiroMatriz(linha, coluna, "@"); //Casas Escuras das linhas impares
-                    }
-                }
-                /*
-                 * Casas possiveis de uso (escuras) as configuradas com # para uso posterior
-                 */
-                if (getDesenhaTabuleiroMatriz(linha, coluna).equals("#")) {
-                    getCasas()[linha][coluna].setBackground(getCorCasaEscura());
-                    getCasas()[linha][coluna].setForeground(getCorCasaEscura());
-                } else {
-                    getCasas()[linha][coluna].setBackground(getCorCasaClara());
-                    getCasas()[linha][coluna].setForeground(getCorCasaClara());
-                }
-            }
-        }
-    }
-
-    private void exibeJogadasPossiveis(int x, int y) {
-        if (getDesenhaTabuleiroMatriz(x, y).equals(getJogadorDaVez()) && getJogadorDaVez().equals("0")) {
+    private void showJogadasPossiveis(int x, int y) {
+        if (getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 0) {
             if (x < 7) {
                 if (y < 7) {
-                    /*
-                     * Se ainda nao estiver proximo da ultima casa, valido as posicoes abaixo
-                     *
-                     */
-                    if (getDesenhaTabuleiroMatriz(x + 1, y + 1).equals("1") && y < 6 && x < 6) {
-                        if (getDesenhaTabuleiroMatriz(x + 2, +2).equals("#")) {
+                    if (getCasas()[x + 1][y + 1].getPedra() != null
+                            && getCasas()[x + 1][y + 1].getPedra().getId() != getJogadorDaVez()
+                            && y < 6 && x < 6) {
+                        if (getCasas()[x + 2][y + 2].isCasaPossivel()
+                                && getCasas()[x + 2][y + 2].getPedra() == null) {
                             getCasas()[x + 2][y + 2].setMovimentoPossivel(true, Color.black);
                         }
                     }
-                    if (getDesenhaTabuleiroMatriz(x + 1, y + 1).equals("#")) {
+                    if (getCasas()[x + 1][y + 1].getPedra() == null) {
                         getCasas()[x + 1][y + 1].setMovimentoPossivel(true, Color.black);
                     }
                 }
                 if (y > 0) {
-                    if (getDesenhaTabuleiroMatriz(x + 1, y - 1).equals("1") && x < 6 && y > 1) {
-                        if (getDesenhaTabuleiroMatriz(x + 2, y - 2).equals("#")) {
+                    if (getCasas()[x + 1][y - 1].getPedra() != null
+                            && getCasas()[x + 1][y - 1].getPedra().getId() != getJogadorDaVez()
+                            && x < 6 && y > 1) {
+                        if (getCasas()[x + 2][y - 2].isCasaPossivel()
+                                && getCasas()[x + 2][y - 2].getPedra() == null) {
                             getCasas()[x + 2][y - 2].setMovimentoPossivel(true, Color.black);
                         }
                     }
-                    if (getDesenhaTabuleiroMatriz(x + 1, y - 1).equals("#")) {
+                    if (getCasas()[x + 1][y - 1].isCasaPossivel()
+                            && getCasas()[x + 1][y - 1].getPedra() == null) {
                         getCasas()[x + 1][y - 1].setMovimentoPossivel(true, Color.black);
                     }
                 }
             }
+            /*
+             * Implementar validacao de dama
+             */
         }
 
-
-        if (getDesenhaTabuleiroMatriz(x, y).equals(getJogadorDaVez()) && getJogadorDaVez().equals("1")) {
+        if (getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 1) {
             if (x > 0) {
                 if (y < 7) {
-                    if (getDesenhaTabuleiroMatriz(x - 1, y + 1).equals("0") && y < 6 && x > 1) {
-                        if (getDesenhaTabuleiroMatriz(x - 2, y + 2).equals("#")) {
+                    if (getCasas()[x - 1][y + 1].getPedra() != null
+                            && getCasas()[x - 1][y + 1].getPedra().getId() != getJogadorDaVez() && y < 6 && x > 1) {
+                        if (getCasas()[x - 2][y + 2].isCasaPossivel()
+                                && getCasas()[x - 2][y + 2].getPedra() == null) {
                             getCasas()[x - 2][y + 2].setMovimentoPossivel(true, Color.black);
                         }
                     }
-                    if (getDesenhaTabuleiroMatriz(x - 1, y + 1).equals("#")) {
+                    if (getCasas()[x - 1][y + 1].isCasaPossivel()
+                            && getCasas()[x - 1][y + 1].getPedra() == null) {
                         getCasas()[x - 1][y + 1].setMovimentoPossivel(true, Color.black);
                     }
                 }
                 if (y > 0) {
-                    if (getDesenhaTabuleiroMatriz(x - 1, y - 1).equals("0") && x > 1 && y > 1) {
-                        if (getDesenhaTabuleiroMatriz(x - 2, y - 2).equals("#")) {
+                    if (getCasas()[x - 1][y - 1].getPedra() != null
+                            && getCasas()[x - 1][y - 1].getPedra().getId() != getJogadorDaVez()
+                            && x > 1 && y > 1) {
+                        if (getCasas()[x - 2][y - 2].isMovimentoPossivel()
+                                && getCasas()[x - 2][y - 2].getPedra() == null) {
                             getCasas()[x - 2][y - 2].setMovimentoPossivel(true, Color.black);
                         }
                     }
-                    if (getDesenhaTabuleiroMatriz(x - 1, y - 1).equals("#")) {
+                    if (getCasas()[x - 1][y - 1].getPedra() == null) {
                         getCasas()[x - 1][y - 1].setMovimentoPossivel(true, Color.black);
                     }
                 }
             }
+            /*
+             * Implementar validacao de dama
+             */
         }
     }
 
@@ -205,58 +185,16 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         return casas;
     }
 
-    /**
-     * @return the tabuleiroContainer
-     */
-    public Container getTabuleiroContainer() {
-        return tabuleiroContainer;
-    }
-
-    /**
-     * @param tabuleiroContainer the tabuleiroContainer to set
-     */
-    public void setTabuleiroContainer(Container tabuleiroContainer) {
-        this.tabuleiroContainer = tabuleiroContainer;
-    }
-
-    /**
-     * @return the tabuleiroGridBagLayout
-     */
-    public GridBagLayout getTabuleiroGridBagLayout() {
-        return tabuleiroGridBagLayout;
-    }
-
-    /**
-     * @param tabuleiroGridBagLayout the tabuleiroGridBagLayout to set
-     */
-    public void setTabuleiroGridBagLayout(GridBagLayout tabuleiroGridBagLayout) {
-        this.tabuleiroGridBagLayout = tabuleiroGridBagLayout;
-    }
-
-    /**
-     * @return the tabuleiroGBConstraints
-     */
-    public GridBagConstraints getTabuleiroGBConstraints() {
-        return tabuleiroGBConstraints;
-    }
-
-    /**
-     * @param tabuleiroGBConstraints the tabuleiroGBConstraints to set
-     */
-    public void setTabuleiroGBConstraints(GridBagConstraints tabuleiroGBConstraints) {
-        this.tabuleiroGBConstraints = tabuleiroGBConstraints;
-    }
     /*
      * AdicionaComponente foi criado para incluir o componente casa no container tabuleiro
      */
-
-    public void adicionaComponente(Component c, int linha, int coluna, int width, int height) {
+    public void adicionaComponente(Component comp, int linha, int coluna, int width, int height) {
         getTabuleiroGBConstraints().gridx = coluna;
         getTabuleiroGBConstraints().gridy = linha;
         getTabuleiroGBConstraints().gridwidth = width;
         getTabuleiroGBConstraints().gridheight = height;
-        getTabuleiroGridBagLayout().setConstraints(c, getTabuleiroGBConstraints());
-        getTabuleiroContainer().add(c);
+        getTabuleiroGridBagLayout().setConstraints(comp, getTabuleiroGBConstraints());
+        getTabuleiroContainer().add(comp);
     }
 
     public void mostra(JDesktopPane main) {
@@ -265,8 +203,13 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         show();
     }
 
-    public void move(int colunaOrigem, int linhaOrigem, int colunaDestino, int linhaDestino) {
-
+    public void move(int linhaOrigem, int ColunaOrigem, int LinhaDestino, int ColunaDestino) {
+        Casa origem = getCasas()[linhaOrigem][ColunaOrigem];
+        Casa destino = getCasas()[LinhaDestino][ColunaDestino];
+        getCasas()[LinhaDestino][ColunaDestino].setPedra(getCasas()[linhaOrigem][ColunaOrigem].getPedra());
+        getCasas()[linhaOrigem][ColunaOrigem].retiraPedra();
+        destino.setForeground(origem.getForeground());
+        origem.setForeground(origem.getBackground());
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -275,8 +218,16 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          */
         int y = ((e.getX()) / (super.getWidth() / 8));
         int x = ((e.getY() - valAjuste) / (super.getHeight() / 8));
-        System.out.println("Clicado -> linha ->" + x + " coluna ->" + y);
-        System.out.println(getDesenhaTabuleiroMatriz(x, y));
+        System.out.println("mouseClicked -> linha ->" + x + " coluna ->" + y);
+        if (getCasas()[x][y].isCasaPossivel()) {
+            if (getCasas()[x][y].getPedra() == null) {
+                System.out.println("Casa Desocupada");
+            } else {
+                System.out.println(getCasas()[x][y].getPedra().getId());
+            }
+        } else {
+            System.out.println("casa nao eh possivel ser usada");
+        }
     }
 
     public void mousePressed(MouseEvent e) {
@@ -314,28 +265,43 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
 
         if (getCasas()[x][y].isMovimentoPossivel()) {
         }
-        this.desmarcaSelecao();
+        this.hideCasaSelecionada();
+        this.hideMovimentosPossiveis();
 
-        if (!getDesenhaTabuleiroMatriz(x, y).equals("@") && !getDesenhaTabuleiroMatriz(x, y).equals("#")) {
+        if (getCasas()[x][y].isCasaPossivel() && getCasas()[x][y].getPedra() != null) {
             /*
              * seta como selecionada a casa, pintando sua borda
              */
             getCasas()[x][y].setCasaSelecionada(true, Color.black);
             setxSelecionado(x);
             setySelecionado(y);
-            this.exibeJogadasPossiveis(getxSelecionado(), getySelecionado());
+            this.showJogadasPossiveis(getxSelecionado(), getySelecionado());
         }
-
     }
 
-    private void desmarcaSelecao() {
+    /*
+     * Evento criado para desmarcar as casas possiveis selecionadas.
+     */
+    private void hideMovimentosPossiveis() {
+        for (int linha = 0; linha
+                < 8; linha++) {
+            for (int coluna = 0; coluna
+                    < 8; coluna++) {
+                getCasas()[coluna][linha].setMovimentoPossivel(false, getCorCasaEscura());
+            }
+        }
+    }
+
+    private void hideCasaSelecionada() {
         /*
          * Metodo desativaSelecao - Metodo utilizado para desabilitar a
-         * seleção apos a jogada ou caso selecionado outra pedra
+         * selecao apos a jogada ou caso selecionado outra pedra
          */
-        for (int linha = 0; linha < 8; linha++) {
-            for (int coluna = 0; coluna < 8; coluna++) {
-                getCasas()[linha][coluna].setCasaSelecionada(false, Color.white);
+        for (int linha = 0; linha
+                < 8; linha++) {
+            for (int coluna = 0; coluna
+                    < 8; coluna++) {
+                getCasas()[linha][coluna].setCasaSelecionada(false, getCorCasaEscura());
                 setxSelecionado(-1);
                 setySelecionado(-1);
             }
@@ -343,36 +309,48 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     }
 
     public void mouseEntered(MouseEvent e) {
+        /*
+         * Metodo nao implementado
+         */
     }
 
     public void mouseExited(MouseEvent e) {
+        /*
+         * Metodo nao implementado
+         */
     }
 
     public void mouseDragged(MouseEvent e) {
+        /*
+         * Metodo nao implementado
+         */
     }
 
     public void mouseMoved(MouseEvent e) {
+        /*
+         * Metodo nao implementado
+         */
     }
 
     /**
      * @return the tabuleiro
      */
-    public String getDesenhaTabuleiroMatriz(int linha, int coluna) {
-        return tabuleiroMatriz[linha][coluna];
-    }
-
+//    public String getDesenhaTabuleiroMatriz(int linha, int coluna) {
+//        return tabuleiroMatriz[linha][coluna];
+//    }
     /**
      * @param tabuleiro the tabuleiro to set
      */
-    public void setDesenhaTabuleiroMatriz(int linha, int coluna, String val) {
-        this.tabuleiroMatriz[linha][coluna] = val;
-    }
-
+//    public void setDesenhaTabuleiroMatriz(int linha, int coluna, String val) {
+//        this.tabuleiroMatriz[linha][coluna] = val;
+//    }
     /**
      * @return the xSelecionado
      */
     public int getxSelecionado() {
         return xSelecionado;
+
+
     }
 
     /**
@@ -380,6 +358,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public void setxSelecionado(int xSelecionado) {
         this.xSelecionado = xSelecionado;
+
+
     }
 
     /**
@@ -387,6 +367,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public int getySelecionado() {
         return ySelecionado;
+
+
     }
 
     /**
@@ -394,28 +376,34 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public void setySelecionado(int ySelecionado) {
         this.ySelecionado = ySelecionado;
+
+
     }
 
     private void mudarJogadorVez() {
-        if (getJogadorDaVez().equals("1")) {
-            setJogadorDaVez("0");
+        if (getJogadorDaVez() == 1) {
+            setJogadorDaVez(0);
         } else {
-            setJogadorDaVez("1");
+            setJogadorDaVez(1);
         }
     }
 
     /**
      * @return the jogadorDaVez
      */
-    public String getJogadorDaVez() {
+    public int getJogadorDaVez() {
         return jogadorDaVez;
+
+
     }
 
     /**
      * @param jogadorDaVez the jogadorDaVez to set
      */
-    public void setJogadorDaVez(String jogadorDaVez) {
+    public void setJogadorDaVez(int jogadorDaVez) {
         this.jogadorDaVez = jogadorDaVez;
+
+
     }
 
     /**
@@ -423,6 +411,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public Color getCorCasaClara() {
         return corCasaClara;
+
+
     }
 
     /**
@@ -430,6 +420,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public void setCorCasaClara(Color corCasaClara) {
         this.corCasaClara = corCasaClara;
+
+
     }
 
     /**
@@ -437,6 +429,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public Color getCorCasaEscura() {
         return corCasaEscura;
+
+
     }
 
     /**
@@ -444,5 +438,60 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
      */
     public void setCorCasaEscura(Color corCasaEscura) {
         this.corCasaEscura = corCasaEscura;
+
+
+    }
+
+    /**
+     * @return the tabuleiroContainer
+     */
+    public Container getTabuleiroContainer() {
+        return tabuleiroContainer;
+
+
+    }
+
+    /**
+     * @param tabuleiroContainer the tabuleiroContainer to set
+     */
+    public void setTabuleiroContainer(Container tabuleiroContainer) {
+        this.tabuleiroContainer = tabuleiroContainer;
+
+
+    }
+
+    /**
+     * @return the tabuleiroGridBagLayout
+     */
+    public GridBagLayout getTabuleiroGridBagLayout() {
+        return tabuleiroGridBagLayout;
+
+
+    }
+
+    /**
+     * @param tabuleiroGridBagLayout the tabuleiroGridBagLayout to set
+     */
+    public void setTabuleiroGridBagLayout(GridBagLayout tabuleiroGridBagLayout) {
+        this.tabuleiroGridBagLayout = tabuleiroGridBagLayout;
+
+
+    }
+
+    /**
+     * @return the tabuleiroGBConstraints
+     */
+    public GridBagConstraints getTabuleiroGBConstraints() {
+        return tabuleiroGBConstraints;
+
+
+    }
+
+    /**
+     * @param tabuleiroGBConstraints the tabuleiroGBConstraints to set
+     */
+    public void setTabuleiroGBConstraints(GridBagConstraints tabuleiroGBConstraints) {
+        this.tabuleiroGBConstraints = tabuleiroGBConstraints;
+
     }
 }

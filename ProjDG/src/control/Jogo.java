@@ -51,9 +51,7 @@ public class Jogo extends JFrame {
         tabuleiro = new Tabuleiro();
         jogadores = new Jogador[2]; //criando objeto jogadores
         jogadores[0] = jogador1; //atribindo valores ao jogador 1
-        jogadores[0].setId(0); //Setando id do jogador 1
         jogadores[1] = jogador2; //atribindo valores ao jogador 2
-        jogadores[1].setId(1); //Setando id do jogador 2
         placar = new Placar(jogador1, jogador2);
         distribuirPedras();
         posicionarPedras(jogador1);
@@ -64,13 +62,12 @@ public class Jogo extends JFrame {
          * Inicializando Variaveis
          */
         pedrasCapturadas = new ArrayList<Pedra>();
-        System.out.println("Jogador 1 " + jogadores[0].getNome() + " Jogador 2 " + jogadores[1].getNome());
     }
 
     public static void main(String[] args) {
         System.out.println("Iniciando Damas");
-        jogador1 = new Jogador("Rodrigo");
-        jogador2 = new Jogador("PC");
+        jogador1 = new Jogador("Rodrigo", 0, 0);
+        jogador2 = new Jogador("Oponente", 1, 40);
         Jogo mainFrame = new Jogo(jogador1, jogador2);
         mainFrame.setSize(908, 700);
         mainFrame.setVisible(true);
@@ -82,10 +79,10 @@ public class Jogo extends JFrame {
      */
     public void distribuirPedras() {
         for (int i = 1; i <= 12; i++) {
-            getJogadores()[0].addPedra(new Peca(i, Color.black));
+            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), Color.black));
         }
         for (int i = 13; i <= 24; i++) {
-            getJogadores()[1].addPedra(new Peca(i, Color.white));
+            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), Color.white));
         }
     }
 
@@ -94,24 +91,11 @@ public class Jogo extends JFrame {
      * usando como base uma matriz logica feita para isso.
      */
     public void posicionarPedras(Jogador jogador) {
-        int posicaoInic = -1;
-
         /*
          * jogador 1 inicia na parte superior do tabuleiro com as pedras pretas
          * jogador 2 inicia na parte inferior do tabuleiro com as pedras brancas
          */
 
-        if (jogador.getId() == 0) {
-            /*
-             * Iniciando posicao do jogador um na parte superior
-             */
-            posicaoInic = 0;
-        } else if (jogador.getId() == 1) {
-            /*
-             * Iniciando posicao do jogador um na parte inferior
-             */
-            posicaoInic = 40;
-        }
         /*
          * distribuindo as 12 pecas
          */
@@ -133,27 +117,23 @@ public class Jogo extends JFrame {
                  * [5,0][5,1][5,2][5,3][5,4][5,5][5,6][5,7]
                  * [6,0][6,1][6,2][6,3][6,4][6,5][6,6][6,7]
                  * [7,0][7,1][7,2][7,3][7,4][7,5][7,6][7,7]
+                 *
+                 * Com base na informacao booleana da casa, vejo se ela eh possivel de movimento ou nao, ou seja, casa clara ou escura
+                 * alem disso vejo se a casa atual ja esta ocupada para por uma outra pedra no local.
+                 *
                  */
-                if (getTabuleiro().getDesenhaTabuleiroMatriz(((posicaoInic + qtdCasas) / 8), ((posicaoInic + qtdCasas) % 8)).equals("#")) {
-
+                if ((getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].isCasaPossivel())
+                        && (getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].getPedra() == null)) {
                     /*
-                     * indicando na matriz logica onde cada jogador esta
-                     * Legenda:
-                     * Casa indicada com 0, jogador 1.
-                     * Casa indicada com 1, jogador 2.
+                     * setando as pecas que estao na mao do jogador na casa informada como possivel
                      */
-
-                    if (jogador.getId() == 0) {
-                        getTabuleiro().setDesenhaTabuleiroMatriz(((posicaoInic + qtdCasas) / 8), ((posicaoInic + qtdCasas) % 8), "0");
-                    } else if (jogador.getId() == 1) {
-                        getTabuleiro().setDesenhaTabuleiroMatriz(((posicaoInic + qtdCasas) / 8), ((posicaoInic + qtdCasas) % 8), "1");
-                    }
+                    getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].setPedra(getJogadores()[jogador.getId()].getPedras().get(pecas));
                     /*
-                     * Setando a peca grafica na casa logica
-                     * pintando a area da peca de acordo com a cor definida na pedra
+                     * BREAK 
+                     * O Break foi usado para quando a condicao for atendida, 
+                     * sair do loop e ir para proxima casa, pegando o proximo ID da peca
                      */
-                    getTabuleiro().getCasas()[((posicaoInic + qtdCasas) / 8)][((posicaoInic + qtdCasas) % 8)].setPedra(getJogadores()[jogador.getId()].getPedras().get(pecas));
-                    getTabuleiro().getCasas()[((posicaoInic + qtdCasas) / 8)][((posicaoInic + qtdCasas) % 8)].setForeground(getJogadores()[jogador.getId()].getPedras().get(pecas).getCor());
+                    break;
                 }
             }
         }
@@ -199,36 +179,5 @@ public class Jogo extends JFrame {
      */
     public void setPlacar(Placar placar) {
         this.placar = placar;
-    }
-
-    public static void centerAndShow(Window aWindow) {
-        //note that the order here is important
-
-        aWindow.pack();
-        /*
-         * If called from outside the event dispatch thread (as is
-         * the case upon startup, in the launch thread), then
-         * in principle this code is not thread-safe: once pack has
-         * been called, the component is realized, and (most) further
-         * work on the component should take place in the event-dispatch
-         * thread.
-         *
-         * In practice, it is exceedingly unlikely that this will lead
-         * to an error, since invisible components cannot receive events.
-         */
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension window = aWindow.getSize();
-        //ensure that no parts of aWindow will be off-screen
-        if (window.height > screen.height) {
-            window.height = screen.height;
-        }
-        if (window.width > screen.width) {
-            window.width = screen.width;
-        }
-        int xCoord = (screen.width / 2 - window.width / 2);
-        int yCoord = (screen.height / 2 - window.height / 2);
-        aWindow.setLocation(xCoord, yCoord);
-
-        aWindow.setVisible(true);
     }
 }
