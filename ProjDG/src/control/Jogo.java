@@ -34,7 +34,6 @@ public class Jogo extends JFrame {
         final JDesktopPane guiDamas = new JDesktopPane();
         getContentPane().add(guiDamas);
         setResizable(false);
-
         /*
          * Escutador do click do botao close para fechar o jogo.
          */

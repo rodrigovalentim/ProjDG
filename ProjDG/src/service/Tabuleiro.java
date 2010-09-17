@@ -184,7 +184,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     public Casa[][] getCasas() {
         return casas;
     }
-
     /*
      * AdicionaComponente foi criado para incluir o componente casa no container tabuleiro
      */
