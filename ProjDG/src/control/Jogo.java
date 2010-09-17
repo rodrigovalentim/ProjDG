@@ -33,6 +33,7 @@ public class Jogo extends JFrame {
         super("Faculdade Jorge Amado - Jogo de Damas - Davi | Rodrigo | Ueber");
         final JDesktopPane guiDamas = new JDesktopPane();
         getContentPane().add(guiDamas);
+        setResizable(false);
 
         /*
          * Escutador do click do botao close para fechar o jogo.
