@@ -8,9 +8,9 @@ import model.Pedra;
 public class Casa extends javax.swing.JPanel {
 
     private int id;
-    private Color corSelecionado; //cor quando selecionado
+    private Color corCasaSelecionada; //cor quando selecionado
     private Color corPedra; //cor da pedra
-    private Color corPossivel;
+    private Color corMovimentosPossiveis; //cor dos movimentos possiveis
     private Pedra pedra; //pedra
     private boolean casaSelecionada; //indica casa selecionada
     private boolean movimentoPossivel;
@@ -46,6 +46,9 @@ public class Casa extends javax.swing.JPanel {
         g.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
         /*
          * isCasaSelecionada - Ao selecionar, a borda sera pintada da cor escolhida
+         * a rotina drawRect pinta o quadrado completo, precisando apenas reduzir
+         * a largura e a altura para ele nao pintar em cima da borda.
+         * Rotina abaixo pinta 4 linhas, indo da area mais externa (borda) mais pra dentro.
          */
         if (isCasaSelecionada()) {
             layoutCasa.setColor(getCorSelecionado());
@@ -107,14 +110,14 @@ public class Casa extends javax.swing.JPanel {
      * @return the corSelecionado
      */
     public Color getCorSelecionado() {
-        return corSelecionado;
+        return corCasaSelecionada;
     }
 
     /**
      * @param corSelecionado the corSelecionado to set
      */
     public void setCorSelecionado(Color corSelecionado) {
-        this.corSelecionado = corSelecionado;
+        this.corCasaSelecionada = corSelecionado;
     }
 
     /**
@@ -140,9 +143,9 @@ public class Casa extends javax.swing.JPanel {
 
     /*
      * A classe Dimension encapsula a largura e a altura de um componente,
-     * usando um número inteiro de precisão.
+     * usando um numero inteiro de precisao.
      *
-     * Os metodos a seguir são usados pelo layout manager, facilitando o desenvolvimento
+     * Os metodos a seguir sao usados pelo layout manager, facilitando o desenvolvimento
      *
      * getPreferredSize - retorna o tamanho "preferido" do componente.
      * e o mesmo vem do componenteUI
@@ -178,13 +181,13 @@ public class Casa extends javax.swing.JPanel {
      * @return the corPossivel
      */
     public Color getCorPossivel() {
-        return corPossivel;
+        return corMovimentosPossiveis;
     }
 
     /**
      * @param corPossivel the corPossivel to set
      */
     public void setCorPossivel(Color c) {
-        this.corPossivel = c;
+        this.corMovimentosPossiveis = c;
     }
 }
