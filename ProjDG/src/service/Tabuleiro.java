@@ -148,6 +148,10 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         if (getDesenhaTabuleiroMatriz(x, y).equals(getJogadorDaVez()) && getJogadorDaVez().equals("0")) {
             if (x < 7) {
                 if (y < 7) {
+                    /*
+                     * Se ainda nao estiver proximo da ultima casa, valido as posicoes abaixo
+                     *
+                     */
                     if (getDesenhaTabuleiroMatriz(x + 1, y + 1).equals("1") && y < 6 && x < 6) {
                         if (getDesenhaTabuleiroMatriz(x + 2, +2).equals("#")) {
                             getCasas()[x + 2][y + 2].setMovimentoPossivel(true, Color.black);
