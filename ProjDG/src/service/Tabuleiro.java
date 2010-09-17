@@ -309,12 +309,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          */
 
         if (getCasas()[x][y].isMovimentoPossivel()) {
-//            if (Math.abs(getxSelecionado() - x) == 2) {
-//                System.out.println("comeu");
-//                comePeca((selx + x) / 2, (sely + y) / 2, true);
-//            }
-
-            move(getxSelecionado(), getySelecionado(), x, y);
         }
         this.desmarcaSelecao();
 
