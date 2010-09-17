@@ -7,7 +7,7 @@
  */
 package control;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
@@ -65,7 +65,6 @@ public class Jogo extends JFrame {
          */
         pedrasCapturadas = new ArrayList<Pedra>();
         System.out.println("Jogador 1 " + jogadores[0].getNome() + " Jogador 2 " + jogadores[1].getNome());
-        show();
     }
 
     public static void main(String[] args) {
@@ -73,7 +72,7 @@ public class Jogo extends JFrame {
         jogador1 = new Jogador("Rodrigo");
         jogador2 = new Jogador("PC");
         Jogo mainFrame = new Jogo(jogador1, jogador2);
-        mainFrame.setSize(610, 432);
+        mainFrame.setSize(908, 700);
         mainFrame.setVisible(true);
     }
 
@@ -200,5 +199,36 @@ public class Jogo extends JFrame {
      */
     public void setPlacar(Placar placar) {
         this.placar = placar;
+    }
+
+    public static void centerAndShow(Window aWindow) {
+        //note that the order here is important
+
+        aWindow.pack();
+        /*
+         * If called from outside the event dispatch thread (as is
+         * the case upon startup, in the launch thread), then
+         * in principle this code is not thread-safe: once pack has
+         * been called, the component is realized, and (most) further
+         * work on the component should take place in the event-dispatch
+         * thread.
+         *
+         * In practice, it is exceedingly unlikely that this will lead
+         * to an error, since invisible components cannot receive events.
+         */
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension window = aWindow.getSize();
+        //ensure that no parts of aWindow will be off-screen
+        if (window.height > screen.height) {
+            window.height = screen.height;
+        }
+        if (window.width > screen.width) {
+            window.width = screen.width;
+        }
+        int xCoord = (screen.width / 2 - window.width / 2);
+        int yCoord = (screen.height / 2 - window.height / 2);
+        aWindow.setLocation(xCoord, yCoord);
+
+        aWindow.setVisible(true);
     }
 }

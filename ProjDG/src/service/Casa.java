@@ -10,8 +10,10 @@ public class Casa extends javax.swing.JPanel {
     private int id;
     private Color corSelecionado; //cor quando selecionado
     private Color corPedra; //cor da pedra
+    private Color corPossivel;
     private Pedra pedra; //pedra
     private boolean casaSelecionada; //indica casa selecionada
+    private boolean movimentoPossivel;
     private Graphics layoutCasa; //layout da casa
 
     public Casa(int id, Color cor) {
@@ -22,6 +24,7 @@ public class Casa extends javax.swing.JPanel {
         setLayoutCasa(null);
         this.setBackground(cor);
         this.setForeground(cor);
+        setMovimentoPossivel(false, null);
     }
 
     public void paintComponent(Graphics g) {
@@ -41,14 +44,22 @@ public class Casa extends javax.swing.JPanel {
          *
          */
         g.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
-
         /*
-         * isCasaSelecionada - Ao selecionar, a borda sera pintada de outra cor
+         * isCasaSelecionada - Ao selecionar, a borda sera pintada da cor escolhida
          */
         if (isCasaSelecionada()) {
             layoutCasa.setColor(getCorSelecionado());
             layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
             layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
+            layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
+            layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
+        }
+        if (isMovimentoPossivel()) {
+            layoutCasa.setColor(getCorPossivel());
+            layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
+            layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
+            layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
+            layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
     }
 
@@ -86,9 +97,9 @@ public class Casa extends javax.swing.JPanel {
     /**
      * @param casaSelecionada the casaSelecionada to set
      */
-    public void setCasaSelecionada(boolean casaSelecionada, Color corCasaSelecionada) {
-        this.setCorSelecionado(corSelecionado); //Setando cor da casa selecionada
-        this.casaSelecionada = casaSelecionada; //setando true para casa selecionada
+    public void setCasaSelecionada(boolean selecionada, Color cor) {
+        this.setCorSelecionado(cor); //Setando cor da casa selecionada
+        this.casaSelecionada = selecionada; //setando true para casa selecionada
         repaint();
     }
 
@@ -142,5 +153,38 @@ public class Casa extends javax.swing.JPanel {
 
     public Dimension getMinimumSize() {
         return getPreferredSize();
+    }
+
+    /**
+     * @return the movimentoPossivel
+     */
+    public boolean isMovimentoPossivel() {
+        return movimentoPossivel;
+    }
+
+    /**
+     * @param movimentoPossivel the movimentoPossivel to set
+     */
+    public void setMovimentoPossivel(boolean m, Color c) {
+        if (movimentoPossivel) {
+            System.out.println("Possivel");
+        }
+        setCorPossivel(c);
+        this.movimentoPossivel = m;
+        repaint();
+    }
+
+    /**
+     * @return the corPossivel
+     */
+    public Color getCorPossivel() {
+        return corPossivel;
+    }
+
+    /**
+     * @param corPossivel the corPossivel to set
+     */
+    public void setCorPossivel(Color c) {
+        this.corPossivel = c;
     }
 }
