@@ -56,13 +56,17 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
          * que sao definidos usando a classe GridBagLayout.
          */
         tabuleiroGBConstraints = new GridBagConstraints();
+        /*
+         * A rotina abaixo faz com que as pecas fiquem uniformes
+         * sem espacamento entre elas.
+         */
         getTabuleiroGBConstraints().fill = GridBagConstraints.BOTH;
 
         /*
-         * Especifica como distribuir o espaco horizontal e vertical extra.
-         * Com essa opcao, o gerenciador do layout (manager layout) consegue calcular e
-         * gerenciar melhor os espacos extras. por isso que quando usamos o gridLayout,
-         * ele coloca todos os objetos lado - a - lado
+         * As opcoes abaixo, quando setadas com valores positivos, diz que a borda do InternalFrame (IF)
+         * tera este valor, ou seja, nao sobrara espaco em branco para exibicao do background do IF
+         *
+         * Se configuradas com valores negativos, ai a borda aparecera
          */
 
         getTabuleiroGBConstraints().weightx = 1;
@@ -190,14 +194,15 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
             if (Math.abs(getOldY() - y) == 2) {
                 System.out.println("divisao " + ((getOldX() + x) / 2) + " " + ((getOldY() + y) / 2));
                 retiraPeca((getOldX() + x) / 2, (getOldY() + y) / 2);
+                move(getOldX(), getOldY(), x, y);
                 /*
                  * Implementando rotina para comer n pecas se possivel
                  */
                 analisaJogadas(x, y);
             } else {
                 System.out.println(getOldY() - y);
+                move(getOldX(), getOldY(), x, y);
             }
-            move(getOldX(), getOldY(), x, y);
             if (!isNovaJogada()) {
                 mudarJogadorVez();
             }
@@ -206,10 +211,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         /*
          * Remove selecao feita ao clicar em qualquer parte do tabuleiro.
          */
-        if (!isNovaJogada()) {
-            hideCasaSelecionada();
-            hideMovimentosPossiveis();
-        }
+        hideCasaSelecionada();
+        hideMovimentosPossiveis();
         if (getCasas()[x][y].isCasaPossivel()
                 && getCasas()[x][y].getPedra() != null
                 && getCasas()[x][y].getPedra().getId() == getJogadorDaVez()) {
