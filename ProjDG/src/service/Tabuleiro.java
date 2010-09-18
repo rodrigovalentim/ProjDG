@@ -136,11 +136,15 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         show();
     }
 
-    public void move(int linhaOrigem, int ColunaOrigem, int LinhaDestino, int ColunaDestino) {
-        getCasas()[LinhaDestino][ColunaDestino].setPedra(getCasas()[linhaOrigem][ColunaOrigem].getPedra());
-        getCasas()[linhaOrigem][ColunaOrigem].retiraPedra();
-        getCasas()[LinhaDestino][ColunaDestino].setForeground(getCasas()[getOldX()][getOldY()].getForeground());
-        getCasas()[linhaOrigem][ColunaOrigem].setForeground(getCasas()[getOldX()][getOldY()].getBackground());
+    public void move(int linhaCasaOrigem, int ColunaCasaOrigem, int LinhaCasaDestino, int ColunaCasaDestino) {
+        getCasas()[LinhaCasaDestino][ColunaCasaDestino].setPedra(getCasas()[linhaCasaOrigem][ColunaCasaOrigem].getPedra());
+        getCasas()[linhaCasaOrigem][ColunaCasaOrigem].retiraPedra();
+        getCasas()[LinhaCasaDestino][ColunaCasaDestino].setForeground(getCasas()[getOldX()][getOldY()].getForeground());
+        getCasas()[linhaCasaOrigem][ColunaCasaOrigem].setForeground(getCasas()[getOldX()][getOldY()].getBackground());
+        System.out.println(LinhaCasaDestino+" "+getJogadorDaVez());
+        if ((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) {
+//            getCasas()[LinhaCasaDestino][ColunaCasaDestino].getPedra().
+        }
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -161,8 +165,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         }
     }
 
-    public void mousePressed(MouseEvent e) {
-    }
+    public void mousePressed(MouseEvent e) {}
 
     public void mouseReleased(MouseEvent e) {
         /*
@@ -207,7 +210,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                 mudarJogadorVez();
             }
         }
-
         /*
          * Remove selecao feita ao clicar em qualquer parte do tabuleiro.
          */
@@ -322,29 +324,20 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         }
     }
 
-    public void mouseEntered(MouseEvent e) {
-        /*
-         * Metodo nao implementado
-         */
+    public void promovePedra(int x, int y) {
+        Casa c = getCasas()[x][y];
+//        c.getPedra()
+        getCasas()[x][y].retiraPedra();
+
     }
 
-    public void mouseExited(MouseEvent e) {
-        /*
-         * Metodo nao implementado
-         */
-    }
+    public void mouseEntered(MouseEvent e) {}
 
-    public void mouseDragged(MouseEvent e) {
-        /*
-         * Metodo nao implementado
-         */
-    }
+    public void mouseExited(MouseEvent e) {}
 
-    public void mouseMoved(MouseEvent e) {
-        /*
-         * Metodo nao implementado
-         */
-    }
+    public void mouseDragged(MouseEvent e) {}
+
+    public void mouseMoved(MouseEvent e) {}
 
     /**
      * @return the xSelecionado
@@ -365,8 +358,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public int getOldY() {
         return oldY;
-
-
     }
 
     /**
@@ -374,8 +365,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setOldY(int oldY) {
         this.oldY = oldY;
-
-
     }
 
     private void mudarJogadorVez() {
@@ -391,8 +380,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public int getJogadorDaVez() {
         return jogadorDaVez;
-
-
     }
 
     /**
@@ -400,8 +387,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setJogadorDaVez(int jogadorDaVez) {
         this.jogadorDaVez = jogadorDaVez;
-
-
     }
 
     /**
@@ -409,8 +394,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public Color getCorCasaClara() {
         return corCasaClara;
-
-
     }
 
     /**
@@ -418,8 +401,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setCorCasaClara(Color corCasaClara) {
         this.corCasaClara = corCasaClara;
-
-
     }
 
     /**
@@ -427,8 +408,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public Color getCorCasaEscura() {
         return corCasaEscura;
-
-
     }
 
     /**
@@ -436,8 +415,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setCorCasaEscura(Color corCasaEscura) {
         this.corCasaEscura = corCasaEscura;
-
-
     }
 
     /**
@@ -445,8 +422,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public Container getTabuleiroContainer() {
         return tabuleiroContainer;
-
-
     }
 
     /**
@@ -454,8 +429,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setTabuleiroContainer(Container tabuleiroContainer) {
         this.tabuleiroContainer = tabuleiroContainer;
-
-
     }
 
     /**
@@ -463,8 +436,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public GridBagLayout getTabuleiroGridBagLayout() {
         return tabuleiroGridBagLayout;
-
-
     }
 
     /**
@@ -472,8 +443,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setTabuleiroGridBagLayout(GridBagLayout tabuleiroGridBagLayout) {
         this.tabuleiroGridBagLayout = tabuleiroGridBagLayout;
-
-
     }
 
     /**
@@ -481,8 +450,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public GridBagConstraints getTabuleiroGBConstraints() {
         return tabuleiroGBConstraints;
-
-
     }
 
     /**
@@ -490,7 +457,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setTabuleiroGBConstraints(GridBagConstraints tabuleiroGBConstraints) {
         this.tabuleiroGBConstraints = tabuleiroGBConstraints;
-
     }
 
     /**

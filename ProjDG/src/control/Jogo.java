@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import model.Pedra;
 import service.Jogador;
 import service.Peca;
