@@ -12,5 +12,4 @@ public class Dama extends Pedra{
     public String identificaPedra(){
         return "dama";
     }
-
 }

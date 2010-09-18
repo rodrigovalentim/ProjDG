@@ -12,10 +12,10 @@ import javax.swing.JInternalFrame;
  * Documentacao usada para decidir sobre o InternalFrame
  * http://java.sun.com/docs/books/tutorial/uiswing/components/internalframe.html
  *
- * Foi necessario implementar o mouseListener e o MouseMotionListen
+ * Foi necessario implementar o MouseListener para capturar o movimento das pecas
  *
  */
-public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMotionListener {
+public class Tabuleiro extends JInternalFrame implements MouseListener {
 
     private Casa[][] casas;
     private Container tabuleiroContainer;
@@ -23,9 +23,10 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     private GridBagConstraints tabuleiroGBConstraints;
     private Color corCasaClara;
     private Color corCasaEscura;
+    private boolean novaJogada;
     private int jogadorDaVez;
-    private int xSelecionado;
-    private int ySelecionado;
+    private int oldX;
+    private int oldY;
     private static final int valAjuste = 10;
 
     public Tabuleiro() {
@@ -34,12 +35,11 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          * com isso e possivel pegar os clicks do mesmo e saber quais pecas estao querendo movimentar
          */
         addMouseListener(this);
-        addMouseMotionListener(this);
         /*
          * Inicializando Variaveis
          */
-        this.setxSelecionado(-1);
-        this.setySelecionado(-1);
+        this.setOldX(-1);
+        this.setOldY(-1);
         /*
          * getContentPane - retorna o conteudo do painel para esse frame
          * assim o metodo setTabuleiroContainer podera pegar o conteudo do
@@ -110,83 +110,13 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
         setSize(700, 670);
     }
 
-    private void showJogadasPossiveis(int x, int y) {
-        if (getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 0) {
-            if (x < 7) {
-                if (y < 7) {
-                    if (getCasas()[x + 1][y + 1].getPedra() != null
-                            && getCasas()[x + 1][y + 1].getPedra().getId() != getJogadorDaVez()
-                            && y < 6 && x < 6) {
-                        if (getCasas()[x + 2][y + 2].isCasaPossivel()
-                                && getCasas()[x + 2][y + 2].getPedra() == null) {
-                            getCasas()[x + 2][y + 2].setMovimentoPossivel(true, Color.black);
-                        }
-                    }
-                    if (getCasas()[x + 1][y + 1].getPedra() == null) {
-                        getCasas()[x + 1][y + 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-                if (y > 0) {
-                    if (getCasas()[x + 1][y - 1].getPedra() != null
-                            && getCasas()[x + 1][y - 1].getPedra().getId() != getJogadorDaVez()
-                            && x < 6 && y > 1) {
-                        if (getCasas()[x + 2][y - 2].isCasaPossivel()
-                                && getCasas()[x + 2][y - 2].getPedra() == null) {
-                            getCasas()[x + 2][y - 2].setMovimentoPossivel(true, Color.black);
-                        }
-                    }
-                    if (getCasas()[x + 1][y - 1].isCasaPossivel()
-                            && getCasas()[x + 1][y - 1].getPedra() == null) {
-                        getCasas()[x + 1][y - 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-            }
-            /*
-             * Implementar validacao de dama
-             */
-        }
-
-        if (getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 1) {
-            if (x > 0) {
-                if (y < 7) {
-                    if (getCasas()[x - 1][y + 1].getPedra() != null
-                            && getCasas()[x - 1][y + 1].getPedra().getId() != getJogadorDaVez() && y < 6 && x > 1) {
-                        if (getCasas()[x - 2][y + 2].isCasaPossivel()
-                                && getCasas()[x - 2][y + 2].getPedra() == null) {
-                            getCasas()[x - 2][y + 2].setMovimentoPossivel(true, Color.black);
-                        }
-                    }
-                    if (getCasas()[x - 1][y + 1].isCasaPossivel()
-                            && getCasas()[x - 1][y + 1].getPedra() == null) {
-                        getCasas()[x - 1][y + 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-                if (y > 0) {
-                    if (getCasas()[x - 1][y - 1].getPedra() != null
-                            && getCasas()[x - 1][y - 1].getPedra().getId() != getJogadorDaVez()
-                            && x > 1 && y > 1) {
-                        if (getCasas()[x - 2][y - 2].isMovimentoPossivel()
-                                && getCasas()[x - 2][y - 2].getPedra() == null) {
-                            getCasas()[x - 2][y - 2].setMovimentoPossivel(true, Color.black);
-                        }
-                    }
-                    if (getCasas()[x - 1][y - 1].getPedra() == null) {
-                        getCasas()[x - 1][y - 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-            }
-            /*
-             * Implementar validacao de dama
-             */
-        }
-    }
-
     public Casa[][] getCasas() {
         return casas;
     }
     /*
      * AdicionaComponente foi criado para incluir o componente casa no container tabuleiro
      */
+
     public void adicionaComponente(Component comp, int linha, int coluna, int width, int height) {
         getTabuleiroGBConstraints().gridx = coluna;
         getTabuleiroGBConstraints().gridy = linha;
@@ -203,12 +133,10 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     }
 
     public void move(int linhaOrigem, int ColunaOrigem, int LinhaDestino, int ColunaDestino) {
-        Casa origem = getCasas()[linhaOrigem][ColunaOrigem];
-        Casa destino = getCasas()[LinhaDestino][ColunaDestino];
         getCasas()[LinhaDestino][ColunaDestino].setPedra(getCasas()[linhaOrigem][ColunaOrigem].getPedra());
         getCasas()[linhaOrigem][ColunaOrigem].retiraPedra();
-        destino.setForeground(origem.getForeground());
-        origem.setForeground(origem.getBackground());
+        getCasas()[LinhaDestino][ColunaDestino].setForeground(getCasas()[getOldX()][getOldY()].getForeground());
+        getCasas()[linhaOrigem][ColunaOrigem].setForeground(getCasas()[getOldX()][getOldY()].getBackground());
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -217,7 +145,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
          */
         int y = ((e.getX()) / (super.getWidth() / 8));
         int x = ((e.getY() - valAjuste) / (super.getHeight() / 8));
-        System.out.println("mouseClicked -> linha ->" + x + " coluna ->" + y);
+        System.out.println("mouseClicked -> linha ->" + x + " coluna ->" + y + " vez = " + getJogadorDaVez());
         if (getCasas()[x][y].isCasaPossivel()) {
             if (getCasas()[x][y].getPedra() == null) {
                 System.out.println("Casa Desocupada");
@@ -257,29 +185,113 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
 
         int y = (e.getX()) / (super.getWidth() / 8);
         int x = (e.getY() - valAjuste) / (super.getHeight() / 8);
+        setNovaJogada(false);
+        if (getCasas()[x][y].isMovimentoPossivel()) {
+            if (Math.abs(getOldY() - y) == 2) {
+                System.out.println("divisao " + ((getOldX() + x) / 2) + " " + ((getOldY() + y) / 2));
+                retiraPeca((getOldX() + x) / 2, (getOldY() + y) / 2);
+                /*
+                 * Implementando rotina para comer n pecas se possivel
+                 */
+                analisaJogadas(x, y);
+            } else {
+                System.out.println(getOldY() - y);
+            }
+            move(getOldX(), getOldY(), x, y);
+            if (!isNovaJogada()) {
+                mudarJogadorVez();
+            }
+        }
 
         /*
-         * remove selecao feita ao clicar na pedra.
+         * Remove selecao feita ao clicar em qualquer parte do tabuleiro.
          */
-
-        if (getCasas()[x][y].isMovimentoPossivel()) {
+        if (!isNovaJogada()) {
+            hideCasaSelecionada();
+            hideMovimentosPossiveis();
         }
-        this.hideCasaSelecionada();
-        this.hideMovimentosPossiveis();
-
-        if (getCasas()[x][y].isCasaPossivel() && getCasas()[x][y].getPedra() != null) {
+        if (getCasas()[x][y].isCasaPossivel()
+                && getCasas()[x][y].getPedra() != null
+                && getCasas()[x][y].getPedra().getId() == getJogadorDaVez()) {
             /*
              * seta como selecionada a casa, pintando sua borda
              */
             getCasas()[x][y].setCasaSelecionada(true, Color.black);
-            setxSelecionado(x);
-            setySelecionado(y);
-            this.showJogadasPossiveis(getxSelecionado(), getySelecionado());
+            setOldX(x);
+            setOldY(y);
+            analisaJogadas(getOldX(), getOldY());
         }
     }
 
+    private void analisaJogadas(int x, int y) {
+        if (getCasas()[x][y].isCasaPossivel() && getCasas()[x][y].getPedra() != null && getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 0) {
+            if (x < 7) {
+                if (y < 7) {
+                    if (getCasas()[x + 1][y + 1].isCasaPossivel() && getCasas()[x + 1][y + 1].getPedra() != null && getCasas()[x + 1][y + 1].getPedra().getId() != getJogadorDaVez() && y < 6 && x < 6) {
+                        if (getCasas()[x + 2][y + 2].isCasaPossivel() && getCasas()[x + 2][y + 2].getPedra() == null) {
+                            getCasas()[x + 2][y + 2].setMovimentoPossivel(true, Color.red);
+                            setNovaJogada(true);
+                        }
+                    }
+                    if (getCasas()[x + 1][y + 1].isCasaPossivel() && getCasas()[x + 1][y + 1].getPedra() == null) {
+                        getCasas()[x + 1][y + 1].setMovimentoPossivel(true, Color.black);
+                    }
+                }
+                if (y > 0) {
+                    if (getCasas()[x + 1][y - 1].isCasaPossivel() && getCasas()[x + 1][y - 1].getPedra() != null && getCasas()[x + 1][y - 1].getPedra().getId() != getJogadorDaVez() && x < 6 && y > 1) {
+                        if (getCasas()[x + 2][y - 2].isCasaPossivel() && getCasas()[x + 2][y - 2].getPedra() == null) {
+                            getCasas()[x + 2][y - 2].setMovimentoPossivel(true, Color.red);
+                            setNovaJogada(true);
+                        }
+                    }
+                    if (getCasas()[x + 1][y - 1].isCasaPossivel() && getCasas()[x + 1][y - 1].getPedra() == null) {
+                        getCasas()[x + 1][y - 1].setMovimentoPossivel(true, Color.black);
+                    }
+                }
+            }
+            /*
+             * Implementar validacao de dama
+             */
+        }
+
+        if (getCasas()[x][y].isCasaPossivel() && getCasas()[x][y].getPedra() != null && getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 1) {
+            if (x > 0) {
+                if (y < 7) {
+                    if (getCasas()[x - 1][y + 1].isCasaPossivel() && getCasas()[x - 1][y + 1].getPedra() != null && getCasas()[x - 1][y + 1].getPedra().getId() != getJogadorDaVez() && y < 6 && x > 1) {
+                        if (getCasas()[x - 2][y + 2].isCasaPossivel() && getCasas()[x - 2][y + 2].getPedra() == null) {
+                            getCasas()[x - 2][y + 2].setMovimentoPossivel(true, Color.red);
+                            setNovaJogada(true);
+                        }
+                    }
+                    if (getCasas()[x - 1][y + 1].isCasaPossivel() && getCasas()[x - 1][y + 1].getPedra() == null) {
+                        getCasas()[x - 1][y + 1].setMovimentoPossivel(true, Color.black);
+                    }
+                }
+                if (y > 0) {
+                    if (getCasas()[x - 1][y - 1].isCasaPossivel() && getCasas()[x - 1][y - 1].getPedra() != null && getCasas()[x - 1][y - 1].getPedra().getId() != getJogadorDaVez() && x > 1 && y > 1) {
+                        if (getCasas()[x - 2][y - 2].isCasaPossivel() && getCasas()[x - 2][y - 2].getPedra() == null) {
+                            getCasas()[x - 2][y - 2].setMovimentoPossivel(true, Color.red);
+                            setNovaJogada(true);
+                        }
+                    }
+                    if (getCasas()[x - 1][y - 1].getPedra() == null) {
+                        getCasas()[x - 1][y - 1].setMovimentoPossivel(true, Color.black);
+                    }
+                }
+            }
+            /*
+             * Implementar validacao de dama
+             */
+        }
+    }
+
+    public void retiraPeca(int x, int y) {
+        getCasas()[x][y].retiraPedra();
+        getCasas()[x][y].setForeground(getCasas()[x][y].getBackground());
+    }
+
     /*
-     * Evento criado para desmarcar as casas possiveis selecionadas.
+     * Metodo criado para desmarcar as casas possiveis selecionadas.
      */
     private void hideMovimentosPossiveis() {
         for (int linha = 0; linha
@@ -301,8 +313,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
             for (int coluna = 0; coluna
                     < 8; coluna++) {
                 getCasas()[linha][coluna].setCasaSelecionada(false, getCorCasaEscura());
-                setxSelecionado(-1);
-                setySelecionado(-1);
+                setOldX(-1);
+                setOldY(-1);
             }
         }
     }
@@ -332,40 +344,24 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     }
 
     /**
-     * @return the tabuleiro
-     */
-//    public String getDesenhaTabuleiroMatriz(int linha, int coluna) {
-//        return tabuleiroMatriz[linha][coluna];
-//    }
-    /**
-     * @param tabuleiro the tabuleiro to set
-     */
-//    public void setDesenhaTabuleiroMatriz(int linha, int coluna, String val) {
-//        this.tabuleiroMatriz[linha][coluna] = val;
-//    }
-    /**
      * @return the xSelecionado
      */
-    public int getxSelecionado() {
-        return xSelecionado;
-
-
+    public int getOldX() {
+        return oldX;
     }
 
     /**
      * @param xSelecionado the xSelecionado to set
      */
-    public void setxSelecionado(int xSelecionado) {
-        this.xSelecionado = xSelecionado;
-
-
+    public void setOldX(int oldX) {
+        this.oldX = oldX;
     }
 
     /**
      * @return the ySelecionado
      */
-    public int getySelecionado() {
-        return ySelecionado;
+    public int getOldY() {
+        return oldY;
 
 
     }
@@ -373,8 +369,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     /**
      * @param ySelecionado the ySelecionado to set
      */
-    public void setySelecionado(int ySelecionado) {
-        this.ySelecionado = ySelecionado;
+    public void setOldY(int oldY) {
+        this.oldY = oldY;
 
 
     }
@@ -492,5 +488,19 @@ public class Tabuleiro extends JInternalFrame implements MouseListener, MouseMot
     public void setTabuleiroGBConstraints(GridBagConstraints tabuleiroGBConstraints) {
         this.tabuleiroGBConstraints = tabuleiroGBConstraints;
 
+    }
+
+    /**
+     * @return the novaJogada
+     */
+    public boolean isNovaJogada() {
+        return novaJogada;
+    }
+
+    /**
+     * @param novaJogada the novaJogada to set
+     */
+    public void setNovaJogada(boolean novaJogada) {
+        this.novaJogada = novaJogada;
     }
 }
