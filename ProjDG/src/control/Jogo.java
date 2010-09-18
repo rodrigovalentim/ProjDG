@@ -13,6 +13,7 @@ import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import javax.swing.JFrame;
 import model.Pedra;
+import service.Dama;
 import service.Jogador;
 import service.Peca;
 import service.Placar;

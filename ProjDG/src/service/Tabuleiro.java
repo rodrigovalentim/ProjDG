@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import model.Pedra;
 
 /*
  * A classe tabuleiro sera extendida do InternalFrame,
@@ -141,9 +142,8 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         getCasas()[linhaCasaOrigem][ColunaCasaOrigem].retiraPedra();
         getCasas()[LinhaCasaDestino][ColunaCasaDestino].setForeground(getCasas()[getOldX()][getOldY()].getForeground());
         getCasas()[linhaCasaOrigem][ColunaCasaOrigem].setForeground(getCasas()[getOldX()][getOldY()].getBackground());
-        System.out.println(LinhaCasaDestino+" "+getJogadorDaVez());
-        if ((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) {
-//            getCasas()[LinhaCasaDestino][ColunaCasaDestino].getPedra().
+        if (((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (LinhaCasaDestino == 0))) {
+            promovePedra(LinhaCasaDestino, ColunaCasaDestino);
         }
     }
 
@@ -158,14 +158,15 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
             if (getCasas()[x][y].getPedra() == null) {
                 System.out.println("Casa Desocupada");
             } else {
-                System.out.println(getCasas()[x][y].getPedra().getId());
+                System.out.println(getCasas()[x][y].getPedra().getId() + " " + getCasas()[x][y].getPedra().identificaPedra());
             }
         } else {
             System.out.println("casa nao eh possivel ser usada");
         }
     }
 
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+    }
 
     public void mouseReleased(MouseEvent e) {
         /*
@@ -325,19 +326,22 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     }
 
     public void promovePedra(int x, int y) {
-        Casa c = getCasas()[x][y];
-//        c.getPedra()
+        Pedra pedra = new Dama(getJogadorDaVez(), getCasas()[x][y].getPedra().getCor());
         getCasas()[x][y].retiraPedra();
-
+        getCasas()[x][y].setPedra(pedra);
     }
 
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
-    public void mouseDragged(MouseEvent e) {}
+    public void mouseDragged(MouseEvent e) {
+    }
 
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+    }
 
     /**
      * @return the xSelecionado

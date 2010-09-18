@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import model.Pedra;
 
 public class Casa extends javax.swing.JPanel {
+
     private int id;
     private Color corCasaSelecionada; //cor quando selecionado
     private boolean casaPossivel;
@@ -25,12 +26,12 @@ public class Casa extends javax.swing.JPanel {
         setCasaPossivel(possivel);
     }
 
-    public void paintComponent(Graphics g) {
-        layoutCasa = g;
+    public void paintComponent(Graphics graphics) {
+        layoutCasa = graphics;
         /*
          * super.paintComponent(g);  - chamando construtor do JPanel, swing lhe ajuda a desenhar a tela
          */
-        super.paintComponent(g);
+        super.paintComponent(graphics);
         /*
          * fillOval - Preenche uma area oval delimitada pelo retangulo especificado e com a cor atual configurada.
          * a cor configurada esta sendo setada a cor da pedra
@@ -41,7 +42,7 @@ public class Casa extends javax.swing.JPanel {
          * os valores subtraidos da altura e largura, foi definido como 10 para nao ficar uma pedra muito grande.
          *
          */
-        g.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
+        graphics.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
         /*
          * isCasaSelecionada - Ao selecionar, a borda sera pintada da cor escolhida
          * a rotina drawRect pinta o quadrado completo, precisando apenas reduzir
@@ -55,7 +56,6 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
             layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
-
         /*
          * Pinta possiveis casas
          */
@@ -71,6 +71,14 @@ public class Casa extends javax.swing.JPanel {
          */
         if (getPedra() != null) {
             setForeground(getPedra().getCor());
+        }
+
+        if (getPedra() != null && getPedra().identificaPedra().equals("dama")) {
+            layoutCasa.setColor(getBackground());
+            /*
+             * Calculo exato para pintar o centro das pedras de acordo com a cor do jogador
+             */
+            graphics.fillOval(super.getWidth() / 4, super.getHeight() / 4, super.getWidth() / 2, super.getHeight() / 2);
         }
     }
 
