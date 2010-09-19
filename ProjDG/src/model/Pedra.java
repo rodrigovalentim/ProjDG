@@ -6,13 +6,13 @@ public abstract class Pedra {
     private int idOwner;
     private int idPedra;
     private Color cor;
-    private int[] posicao;
+//    private int[] posicao;
 
     public Pedra(int idowner, int idPedra, Color cor){
         setIdOwner(idowner);
         setIdPedra(idPedra);
         setCor(cor);
-        posicao = new int[2];
+//        posicao = new int[2];
     }
 
     public int getIdOwner(){
@@ -31,13 +31,13 @@ public abstract class Pedra {
         this.cor = cor;
     }
 
-    public int[] getPosicao(){
-        return posicao;
-    }
+//    public int[] getPosicao(){
+//        return posicao;
+//    }
 
-    public void setPosicao(int[] posicao) {
-        this.posicao = posicao;
-    }
+//    public void setPosicao(int[] posicao) {
+//        this.posicao = posicao;
+//    }
 
     public abstract String identificaPedra();
 

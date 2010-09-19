@@ -8,11 +8,9 @@
 package main;
 
 import java.awt.*;
-import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import javax.swing.JFrame;
-import model.Pedra;
 import service.Jogador;
 import service.Peca;
 import service.Placar;
@@ -24,7 +22,6 @@ public class Jogo extends JFrame {
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
-    private ArrayList<Pedra> pedrasCapturadas;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
         /*
@@ -60,12 +57,10 @@ public class Jogo extends JFrame {
         /*
          * Inicializando Variaveis
          */
-        pedrasCapturadas = new ArrayList<Pedra>();
     }
 
     public static void main(String[] args) {
         System.out.println("Iniciando Damas");
-
         jogador1 = new Jogador("Player 1", 0, 0);
         jogador2 = new Jogador("Player 2", 1, 40);
         Jogo mainFrame = new Jogo(jogador1, jogador2);

@@ -2,6 +2,7 @@ package service;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import model.Pedra;
@@ -30,6 +31,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     private int oldY;
     private boolean reAnaliseMovimento;
     private static final int valAjusteClick = 10;
+    private ArrayList<Pedra> pedrasCapturadas;
 
     public Tabuleiro() {
         /*
@@ -79,6 +81,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
          */
         setCorCasaClara(new Color(255, 240, 225));
         setCorCasaEscura(new Color(145, 72, 0));
+        pedrasCapturadas = new ArrayList<Pedra>();
 
         int id = 0;
         this.casas = new Casa[8][8];
