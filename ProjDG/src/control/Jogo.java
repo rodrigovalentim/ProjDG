@@ -67,7 +67,6 @@ public class Jogo extends JFrame {
     public static void main(String[] args) {
         System.out.println("Iniciando Damas");
 
-//JOptionPane.showInputDialog(null,"Qual o nome do Primeiro Jogador?","Informe nome",JOptionPane.QUESTION_MESSAGE)
         jogador1 = new Jogador("Player 1", 0, 0);
         jogador2 = new Jogador("Player 2", 1, 40);
         Jogo mainFrame = new Jogo(jogador1, jogador2);
@@ -107,7 +106,7 @@ public class Jogo extends JFrame {
              */
             for (int qtdCasas = 0; qtdCasas < 24; qtdCasas++) {
                 /*
-                 * O calculo usado abaixo, eh a forma mais precisa de identificar a posicao x e y da matriz logica.
+                 * O calculo usado abaixo, eh a forma mais precisa de identificar a posicao testaMovimentos e y da matriz logica.
                  *
                  * Se tenho posicao 0 + qtdCasas que vai de 0 ate ate 23, entao, fazendo o calculo usando DIV e MOD, obtenho exatamente
                  * a posicao X e Y
