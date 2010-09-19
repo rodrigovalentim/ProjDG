@@ -177,9 +177,6 @@ public class Casa extends javax.swing.JPanel {
      * @param movimentoPossivel the movimentoPossivel to set
      */
     public void setMovimentoPossivel(boolean m, Color c) {
-        if (movimentoPossivel) {
-            System.out.println("Possivel");
-        }
         setCorPossivel(c);
         this.movimentoPossivel = m;
         repaint();

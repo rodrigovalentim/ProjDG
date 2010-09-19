@@ -158,7 +158,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
             if (getCasas()[x][y].getPedra() == null) {
                 System.out.println("Casa Desocupada");
             } else {
-                System.out.println(getCasas()[x][y].getPedra().getId() + " " + getCasas()[x][y].getPedra().identificaPedra());
+//                System.out.println(getCasas()[x][y].getPedra().getId() + " " + getCasas()[x][y].getPedra().identificaPedra());
             }
         } else {
             System.out.println("casa nao eh possivel ser usada");
@@ -202,9 +202,10 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                 /*
                  * Implementando rotina para comer n pecas se possivel
                  */
+                setOldX(x);
+                setOldY(y);
                 analistaTipoMovimento(x, y);
             } else {
-                System.out.println(getOldY() - y);
                 move(getOldX(), getOldY(), x, y);
             }
             if (!isNovaJogada()) {
@@ -271,35 +272,15 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                     && getCasas()[x][y].getPedra().getId() == getJogadorDaVez()
                     && getCasas()[x][y].getPedra().identificaPedra().equals("dama")
                     && getJogadorDaVez() == 0) {
-
-                int linha = x;
-                int coluna = y;
-                boolean continua = true;
-                while (getCasas()[linha++][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-                    continua = testaMovimentos(linha, coluna);
-                }
-                linha = x;
-                coluna = y;
-                continua = true;
-                while (getCasas()[linha--][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-                    continua = testaMovimentos(linha, coluna);
-                }
-                linha = x;
-                coluna = y;
-                continua = true;
-                while (getCasas()[linha--][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-                    continua = testaMovimentos(linha, coluna);
-                }
-                linha = x;
-                coluna = y;
-                continua = true;
-                while (getCasas()[linha++][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-                    continua = testaMovimentos(linha, coluna);
-                }
+                testaMovimentos(x, y);
             }
         }
 
-        if (getCasas()[x][y].isCasaPossivel() && getCasas()[x][y].getPedra() != null && getCasas()[x][y].getPedra().getId() == getJogadorDaVez() && getJogadorDaVez() == 1) {
+        if (getCasas()[x][y].isCasaPossivel()
+                && getCasas()[x][y].getPedra() != null
+                && getCasas()[x][y].getPedra().getId() == getJogadorDaVez()
+                && getJogadorDaVez() == 1
+                && getCasas()[x][y].getPedra().identificaPedra().equals("peca")) {
             if (x > 0) {
                 if (y < 7) {
                     if (getCasas()[x - 1][y + 1].isCasaPossivel() && getCasas()[x - 1][y + 1].getPedra() != null && getCasas()[x - 1][y + 1].getPedra().getId() != getJogadorDaVez() && y < 6 && x > 1) {
@@ -324,29 +305,99 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                     }
                 }
             }
+        } else {
+            if (getCasas()[x][y].isCasaPossivel()
+                    && getCasas()[x][y].getPedra() != null
+                    && getCasas()[x][y].getPedra().getId() == getJogadorDaVez()
+                    && getCasas()[x][y].getPedra().identificaPedra().equals("dama")
+                    && getJogadorDaVez() == 1) {
+                testaMovimentos(x, y);
+            }
         }
     }
 
-    public boolean testaMovimentos(int linha, int coluna) {
-        System.out.println("[" + linha + "][" + coluna + "]");
-        if (linha <= 7 && coluna <= 7) {
-            if (getCasas()[linha][coluna].isCasaPossivel() && getCasas()[linha][coluna].getPedra() != null && getCasas()[linha][coluna].getPedra().getId() == getJogadorDaVez()) {
-                System.out.println("[" + linha + "][" + coluna + "] peca propria");
+    private void testaMovimentos(int x, int y) {
+        int linha = x;
+        int coluna = y;
+        boolean continua = true;
+        while (getCasas()[linha++][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
+            continua = estudaJogadas(linha, coluna);
+        }
+        linha = x;
+        coluna = y;
+        continua = true;
+        while (getCasas()[linha--][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
+            continua = estudaJogadas(linha, coluna);
+        }
+        linha = x;
+        coluna = y;
+        continua = true;
+        while (getCasas()[linha--][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
+            continua = estudaJogadas(linha, coluna);
+        }
+        linha = x;
+        coluna = y;
+        continua = true;
+        while (getCasas()[linha++][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
+            continua = estudaJogadas(linha, coluna);
+        }
+    }
+
+    public boolean estudaJogadas(int linha, int coluna) {
+        if (getCasas()[linha][coluna].isCasaPossivel() && getCasas()[linha][coluna].getPedra() != null && getCasas()[linha][coluna].getPedra().getId() == getJogadorDaVez()) {
+            return false;
+        } else {
+            if (linha < 7
+                    && coluna < 7
+                    && linha > getOldX() && coluna > getOldY()
+                    && getCasas()[linha][coluna].isCasaPossivel()
+                    && getCasas()[linha][coluna].getPedra() != null
+                    && getCasas()[linha][coluna].getPedra().getId() != getJogadorDaVez()
+                    && getCasas()[linha - 1][coluna - 1].getPedra() == null
+                    && getCasas()[linha - 1][coluna - 1].isCasaPossivel()) {
+                getCasas()[linha - 1][coluna - 1].setMovimentoPossivel(true, Color.pink);
+                System.out.println("[" + linha + "][" + coluna + "]");
                 return false;
             } else {
-                if (getCasas()[linha][coluna].getPedra() == null) {
-                    getCasas()[linha][coluna].setMovimentoPossivel(true, Color.red);
-                    return true;
-                }
-            }
-        } else {
-            if (linha <= 7 && coluna <= 7) {
-                if (getCasas()[linha][coluna].getPedra() != null
+                if (linha < 7
+                        && coluna > 0
+                        && linha > getOldX() && coluna < getOldY()
+                        && getCasas()[linha][coluna].isCasaPossivel()
+                        && getCasas()[linha][coluna].getPedra() != null
                         && getCasas()[linha][coluna].getPedra().getId() != getJogadorDaVez()
-                        && getCasas()[linha + 1][coluna + 1].getPedra() == null) {
-                    System.out.println("[" + linha + "][" + coluna + "]");
-                    getCasas()[linha + 1][coluna + 1].setMovimentoPossivel(true, Color.red);
+                        && getCasas()[linha + 1][coluna - 1].getPedra() == null
+                        && getCasas()[linha + 1][coluna - 1].isCasaPossivel()) {
+                    getCasas()[linha + 1][coluna - 1].setMovimentoPossivel(true, Color.green);
                     return false;
+                } else {
+                    if (linha > 0
+                            && coluna > 0
+                            && linha < getOldX() && coluna < getOldY()
+                            && getCasas()[linha][coluna].isCasaPossivel()
+                            && getCasas()[linha][coluna].getPedra() != null
+                            && getCasas()[linha][coluna].getPedra().getId() != getJogadorDaVez()
+                            && getCasas()[linha - 1][coluna - 1].getPedra() == null
+                            && getCasas()[linha - 1][coluna - 1].isCasaPossivel()) {
+                        getCasas()[linha - 1][coluna - 1].setMovimentoPossivel(true, Color.blue);
+                        return false;
+                    } else {
+                        if (linha > 0
+                                && coluna < 7
+                                && linha < getOldX() && coluna > getOldY()
+                                && getCasas()[linha][coluna].isCasaPossivel()
+                                && getCasas()[linha][coluna].getPedra() != null
+                                && getCasas()[linha][coluna].getPedra().getId() != getJogadorDaVez()
+                                && getCasas()[linha - 1][coluna + 1].getPedra() == null
+                                && getCasas()[linha - 1][coluna + 1].isCasaPossivel()) {
+                            getCasas()[linha - 1][coluna + 1].setMovimentoPossivel(true, Color.red);
+                            return false;
+                        } else {
+                            if (getCasas()[linha][coluna].getPedra() == null) {
+                                getCasas()[linha][coluna].setMovimentoPossivel(true, Color.CYAN);
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
         }
