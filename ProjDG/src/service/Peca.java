@@ -5,8 +5,8 @@ import model.Pedra;
 
 public class Peca extends Pedra{
 
-    public Peca(int id, Color cor){
-        super(id, cor);
+    public Peca(int idOwner, int idPedra, Color cor){
+        super(idOwner, idPedra, cor);
     }
 
     public String identificaPedra(){
