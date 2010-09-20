@@ -29,9 +29,9 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
-    private boolean reAnaliseMovimento;
     private static final int valAjusteClick = 10;
     private ArrayList<Pedra> pedrasCapturadas;
+    private int id;
 
     public Tabuleiro() {
         /*
@@ -82,27 +82,28 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         setCorCasaClara(new Color(255, 240, 225));
         setCorCasaEscura(new Color(145, 72, 0));
         pedrasCapturadas = new ArrayList<Pedra>();
-
-        int id = 0;
+        setId(0);
         this.casas = new Casa[8][8];
-
+        /*
+         * Criando as casas do tabuleiro
+         */
         for (int linha = 0; linha < casas.length; linha++) {
             for (int coluna = 0; coluna < casas[0].length; coluna++) {
                 if (linha % 2 != 0) {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(id, getCorCasaClara(), false);
-                        id++;
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false);
+                        setId(getId() + 1);
                     } else {
-                        casas[linha][coluna] = new Casa(id, getCorCasaEscura(), true);
-                        id++;
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true);
+                        setId(getId() + 1);
                     }
                 } else {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(id, getCorCasaEscura(), true);
-                        id++;
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true);
+                        setId(getId() + 1);
                     } else {
-                        casas[linha][coluna] = new Casa(id, getCorCasaClara(), false);
-                        id++;
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false);
+                        setId(getId() + 1);
                     }
                 }
                 /*
@@ -114,12 +115,14 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                 adicionaComponente(getCasas()[linha][coluna], linha, coluna, 1, 1);
             }
         }
-        setJogadorDaVez(0);
-        setTitle("Tabuleiro");
-        setSize(700, 670);
-        setReAnaliseMovimento(false);
+        setJogadorDaVez(0); //Jogador da Vez - Inicia com o jogador 0
+        setTitle("Tabuleiro"); //Titulo do Tabuleiro
+        setSize(700, 670); //Size do do tabuleiro
     }
 
+    /*
+     * retorna as Casas
+     */
     public Casa[][] getCasas() {
         return casas;
     }
@@ -136,6 +139,9 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         getTabuleiroContainer().add(comp);
     }
 
+    /*
+     * Exibe esta classe em forma grafica no container principal
+     */
     public void mostra(JDesktopPane main) {
         main.add(this);
         setOpaque(true);
@@ -169,6 +175,9 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         getCasas()[x][y].setPedra(pedra);
     }
 
+    /*
+     * Rotina usada somente para testar movimentos
+     */
     public void mouseClicked(MouseEvent e) {
         /*
          * Testes de X e Y.
@@ -216,9 +225,22 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         int y = (e.getX()) / (super.getWidth() / 8);
         int x = (e.getY() - valAjusteClick) / (super.getHeight() / 8);
         int pecaClick = - 1;
-
+        /*
+         * Variavel abaixo usada para configurar a reanalise dos movimentos
+         */
+        boolean reAnaliseMovimento = false;
+        /*
+         * Metodo set da rotina que configura novaJogada
+         */
         setNovaJogada(false);
+        /*
+         * Rotina abaixo remover que foram "comidas" pelo adversario
+         */
         if (getCasas()[x][y].isMovimentoPossivel()) {
+            /*
+             * Calculo usado para saber se o movimento realizado foi de mais de uma casa
+             * Caso posivito, entra na rotina de analise de possiveis pecas comidas
+             */
             if (Math.abs(getOldY() - y) >= 2) {
                 int l = getOldX(), c = getOldY();
                 if (x > l && y > c) {
@@ -255,28 +277,40 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                         retiraPeca(l, c);
                     }
                 }
-                move(getOldX(), getOldY(), x, y);
                 /*
-                 * Implementando rotina para comer n pecas se possivel
+                 * Rotina de movimentacao da peca, da origem pro destino
                  */
+                move(getOldX(), getOldY(), x, y);
                 setOldX(x);
                 setOldY(y);
-                setReAnaliseMovimento(true);
-                System.out.println("Inicia re-analise movimentos [" + x + "][" + y + "]");
-                analistaTipoMovimento(x, y, isReAnaliseMovimento());
+                reAnaliseMovimento = true;
+                /*
+                 * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
+                 */
+                analistaTipoMovimento(x, y, reAnaliseMovimento);
             } else {
+                /*
+                 * Simples rotina de movimento, sem acao de comer
+                 */
                 move(getOldX(), getOldY(), x, y);
             }
+            /*
+             * Controla vez do jgoador
+             */
             if (!isNovaJogada()) {
                 mudarJogadorVez();
-                setReAnaliseMovimento(false);
+                reAnaliseMovimento = false;
             }
         }
-        hideCasaSelecionada();
-        hideMovimentosPossiveis();
         /*
-         * Remove selecao feita ao clicar em qualquer parte do tabuleiro.
+         * Limpa casas selecionads
          */
+        hideCasaSelecionada();
+        /*
+         * limpa Movimentos selecionados
+         */
+        hideMovimentosPossiveis();
+
         if (getCasas()[x][y].isCasaPossivel()
                 && getCasas()[x][y].getPedra() != null
                 && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
@@ -286,7 +320,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
             getCasas()[x][y].setCasaSelecionada(true, Color.black);
             setOldX(x);
             setOldY(y);
-            analistaTipoMovimento(getOldX(), getOldY(), isReAnaliseMovimento());
+            analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
         }
     }
 
@@ -538,6 +572,9 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
         return false;
     }
 
+    /*
+     * remove e pedra
+     */
     private void retiraPeca(int x, int y) {
         getCasas()[x][y].retiraPedra();
         getCasas()[x][y].setForeground(getCasas()[x][y].getBackground());
@@ -719,16 +756,16 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     }
 
     /**
-     * @return the reAnaliseMovimento
+     * @return the id
      */
-    public boolean isReAnaliseMovimento() {
-        return reAnaliseMovimento;
+    public int getId() {
+        return id;
     }
 
     /**
-     * @param reAnaliseMovimento the reAnaliseMovimento to set
+     * @param id the id to set
      */
-    public void setReAnaliseMovimento(boolean reAnaliseMovimento) {
-        this.reAnaliseMovimento = reAnaliseMovimento;
+    public void setId(int id) {
+        this.id = id;
     }
 }

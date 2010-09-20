@@ -57,7 +57,7 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
         /*
-         * Pinta possiveis casas
+         * Pinta possiveis casas que podem ser movimentadas
          */
         if (isMovimentoPossivel()) {
             layoutCasa.setColor(getCorPossivel());
@@ -67,7 +67,7 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
         /*
-         * atualiza cor da pedra
+         * Atualiza cor da pedra
          */
         if (getPedra() != null) {
             setForeground(getPedra().getCor());

@@ -11,6 +11,7 @@ import java.awt.*;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import javax.swing.JFrame;
+import javax.swing.Timer;
 import service.Jogador;
 import service.Peca;
 import service.Placar;
@@ -22,15 +23,16 @@ public class Jogo extends JFrame {
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
+    private ActionListener action;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
         /*
          * Construindo parte grafica
          */
-        super("Faculdade Jorge Amado - Jogo de Damas - Davi | Rodrigo | Ueber");
+        super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
         final JDesktopPane guiDamas = new JDesktopPane();
         getContentPane().add(guiDamas);
-        setResizable(false);
+        setResizable(false); //impossibilitando o resize
         /*
          * Escutador do click do botao close para fechar o jogo.
          */
@@ -52,11 +54,18 @@ public class Jogo extends JFrame {
         distribuirPedras();
         posicionarPedras(jogador1);
         posicionarPedras(jogador2);
-        getTabuleiro().mostra(guiDamas);
-        getPlacar().mostra(guiDamas);
+        getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
+        getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
         /*
          * Inicializando Variaveis
          */
+        action = new ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                getPlacar().atualizarPlacar();
+            }
+        };
+        initialize();
     }
 
     public static void main(String[] args) {
@@ -174,5 +183,10 @@ public class Jogo extends JFrame {
      */
     public void setPlacar(Placar placar) {
         this.placar = placar;
+    }
+
+    public void initialize() {
+        Timer t = new Timer(5000, action);
+        t.start();
     }
 }
