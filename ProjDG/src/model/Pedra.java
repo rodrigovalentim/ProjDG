@@ -6,13 +6,11 @@ public abstract class Pedra {
     private int idOwner;
     private int idPedra;
     private Color cor;
-//    private int[] posicao;
 
     public Pedra(int idowner, int idPedra, Color cor){
         setIdOwner(idowner);
         setIdPedra(idPedra);
         setCor(cor);
-//        posicao = new int[2];
     }
 
     public int getIdOwner(){
