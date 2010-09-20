@@ -17,7 +17,7 @@ import model.Pedra;
  * Foi necessario implementar o MouseListener para capturar o movimento das pecas
  *
  */
-public class Tabuleiro extends JInternalFrame implements MouseListener {
+public class Tabuleiro extends JInternalFrame {
 
     private Casa[][] casas;
     private Container tabuleiroContainer;
@@ -25,11 +25,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     private GridBagConstraints tabuleiroGBConstraints;
     private Color corCasaClara;
     private Color corCasaEscura;
-    private boolean novaJogada;
-    private int jogadorDaVez;
-    private int oldX;
-    private int oldY;
-    private static final int valAjusteClick = 10;
     private ArrayList<Pedra> pedrasCapturadas;
     private int id;
 
@@ -38,12 +33,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
          * Adicionando o "escutador" de eventos do mouse.
          * com isso e possivel pegar os clicks do mesmo e saber quais pecas estao querendo movimentar
          */
-        addMouseListener(this);
-        /*
-         * Inicializando Variaveis
-         */
-        this.setOldX(-1);
-        this.setOldY(-1);
+
         /*
          * getContentPane - retorna o conteudo do painel para esse frame
          * assim o metodo setTabuleiroContainer podera pegar o conteudo do
@@ -115,7 +105,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
                 adicionaComponente(getCasas()[linha][coluna], linha, coluna, 1, 1);
             }
         }
-        setJogadorDaVez(0); //Jogador da Vez - Inicia com o jogador 0
         setTitle("Tabuleiro"); //Titulo do Tabuleiro
         setSize(700, 670); //Size do do tabuleiro
     }
@@ -149,36 +138,23 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     }
 
     /*
-     * Metodo MOVE remove a pedra da casa de origem e coloca o mesmo na casa de destino.
-     * Caso a casa de destino seja a primeira linha superior (posicao 0 do array) ou inferior (posicao 7 do array)
-     * O metodo promovePedra eh chamado.
-     */
-    private void move(int linhaCasaOrigem, int ColunaCasaOrigem, int LinhaCasaDestino, int ColunaCasaDestino) {
-        getCasas()[LinhaCasaDestino][ColunaCasaDestino].setPedra(getCasas()[linhaCasaOrigem][ColunaCasaOrigem].getPedra());
-        getCasas()[linhaCasaOrigem][ColunaCasaOrigem].retiraPedra();
-        getCasas()[LinhaCasaDestino][ColunaCasaDestino].setForeground(getCasas()[getOldX()][getOldY()].getForeground());
-        getCasas()[linhaCasaOrigem][ColunaCasaOrigem].setForeground(getCasas()[getOldX()][getOldY()].getBackground());
-        if (((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (LinhaCasaDestino == 0))) {
-            promovePedra(LinhaCasaDestino, ColunaCasaDestino);
-        }
-    }
-
-    /*
      * Metodo promovePedra tem a finalidade configurar a pedra atual para Dama
      * - Com isso, criamos o objeto Dama na variavel pedra
      * - Removemos a pedra da casa atual
      * - Colocamos a variavel pedra, que contem o objeto dama na casa
      */
-    private void promovePedra(int x, int y) {
-        Pedra pedra = new Dama(getJogadorDaVez(), getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor());
+    public void promovePedra(int jogadorVez, int x, int y) {
+        Pedra pedra = new Dama(jogadorVez, getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor());
         getCasas()[x][y].retiraPedra();
         getCasas()[x][y].setPedra(pedra);
     }
 
+
+
     /*
      * Rotina usada somente para testar movimentos
      */
-    public void mouseClicked(MouseEvent e) {
+//    public void mouseClicked(MouseEvent e) {
         /*
          * Testes de X e Y.
          */
@@ -194,482 +170,135 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
 //        } else {
 //            System.out.println("casa nao eh possivel ser usada");
 //        }
-    }
+//    }
+//
+//    public void mousePressed(MouseEvent e) {
+//    }
 
-    public void mousePressed(MouseEvent e) {
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        /*
-         * Evento que dispara quando o botao do mouse e solto.
-         *
-         * super.getWidth serve para pegar a largura do componente
-         *
-         * super.getHeight serve para pegar a altura do componente
-         *
-         * A divisao por 8 e necessaria por que temos 8 casas
-         *
-         * Y esta recebendo testaMovimentos e X esta recebendo Y por que o mouseEvent interte isso, pra nos ajudar, claro.
-         * Atraves destes testes, leitura de documentacoes
-         * http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/MouseEvent.html
-         * indentificamos que o MouseEvent retorna X como sendo linha e o Y como sendo coluna.
-         * Invertendo as posicoes, tudo se resolveu.
-         *
-         *
-         * O valor de ajuste igual a 20, quando subtraido da linha, temos uma maior precisao
-         * no calculo nos possibilitando clicar bem proximo da borda da casa sem que ele pegue
-         * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
-         *
-         */
-
-        int y = (e.getX()) / (super.getWidth() / 8);
-        int x = (e.getY() - valAjusteClick) / (super.getHeight() / 8);
-        int pecaClick = - 1;
-        /*
-         * Variavel abaixo usada para configurar a reanalise dos movimentos
-         */
-        boolean reAnaliseMovimento = false;
-        /*
-         * Metodo set da rotina que configura novaJogada
-         */
-        setNovaJogada(false);
-        /*
-         * Rotina abaixo remover que foram "comidas" pelo adversario
-         */
-        if (getCasas()[x][y].isMovimentoPossivel()) {
-            /*
-             * Calculo usado para saber se o movimento realizado foi de mais de uma casa
-             * Caso posivito, entra na rotina de analise de possiveis pecas comidas
-             */
-            if (Math.abs(getOldY() - y) >= 2) {
-                int l = getOldX(), c = getOldY();
-                if (x > l && y > c) {
-                    while (getCasas()[l++][c++].isCasaPossivel()
-                            && l < x
-                            && c < y) {
-                        retiraPeca(l, c);
-                    }
-                }
-                l = getOldX();
-                c = getOldY();
-                if (x > l && y < c) {
-                    while (getCasas()[l++][c--].isCasaPossivel()
-                            && l < x
-                            && c > y) {
-                        retiraPeca(l, c);
-                    }
-                }
-                l = getOldX();
-                c = getOldY();
-                if (x < l && y > c) {
-                    while (getCasas()[l--][c++].isCasaPossivel()
-                            && l > x
-                            && c < y) {
-                        retiraPeca(l, c);
-                    }
-                }
-                l = getOldX();
-                c = getOldY();
-                if (x < l && y < c) {
-                    while (getCasas()[l--][c--].isCasaPossivel()
-                            && l > x
-                            && c > y) {
-                        retiraPeca(l, c);
-                    }
-                }
-                /*
-                 * Rotina de movimentacao da peca, da origem pro destino
-                 */
-                move(getOldX(), getOldY(), x, y);
-                setOldX(x);
-                setOldY(y);
-                reAnaliseMovimento = true;
-                /*
-                 * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
-                 */
-                analistaTipoMovimento(x, y, reAnaliseMovimento);
-            } else {
-                /*
-                 * Simples rotina de movimento, sem acao de comer
-                 */
-                move(getOldX(), getOldY(), x, y);
-            }
-            /*
-             * Controla vez do jgoador
-             */
-            if (!isNovaJogada()) {
-                mudarJogadorVez();
-                reAnaliseMovimento = false;
-            }
-        }
-        /*
-         * Limpa casas selecionads
-         */
-        hideCasaSelecionada();
-        /*
-         * limpa Movimentos selecionados
-         */
-        hideMovimentosPossiveis();
-
-        if (getCasas()[x][y].isCasaPossivel()
-                && getCasas()[x][y].getPedra() != null
-                && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
-            /*
-             * seta como selecionada a casa, pintando sua borda
-             */
-            getCasas()[x][y].setCasaSelecionada(true, Color.black);
-            setOldX(x);
-            setOldY(y);
-            analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
-        }
-    }
-
-    /*
-     * Metodo analisaTipoMovimento
-     * Usado para ver qual tipo de movimento sera realizado, por Peca comum ou por Dama
-     */
-    private void analistaTipoMovimento(int x, int y, boolean reanalise) {
-        if (getCasas()[x][y].isCasaPossivel()
-                && getCasas()[x][y].getPedra() != null
-                && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()
-                && getJogadorDaVez() == 0
-                && getCasas()[x][y].getPedra().identificaPedra().equals("peca")) {
-            if (x < 7) {
-                if (y < 7) {
-                    if (getCasas()[x + 1][y + 1].isCasaPossivel()
-                            && getCasas()[x + 1][y + 1].getPedra() != null
-                            && getCasas()[x + 1][y + 1].getPedra().getIdOwner() != getJogadorDaVez()
-                            && y < 6 && x < 6) {
-                        if (getCasas()[x + 2][y + 2].isCasaPossivel() && getCasas()[x + 2][y + 2].getPedra() == null) {
-                            getCasas()[x + 2][y + 2].setMovimentoPossivel(true, Color.red);
-                            setNovaJogada(true);
-                        }
-                    }
-                    if (getCasas()[x + 1][y + 1].isCasaPossivel() && getCasas()[x + 1][y + 1].getPedra() == null && !reanalise) {
-                        getCasas()[x + 1][y + 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-                if (y > 0) {
-                    if (getCasas()[x + 1][y - 1].isCasaPossivel()
-                            && getCasas()[x + 1][y - 1].getPedra() != null
-                            && getCasas()[x + 1][y - 1].getPedra().getIdOwner() != getJogadorDaVez()
-                            && x < 6 && y > 1) {
-                        if (getCasas()[x + 2][y - 2].isCasaPossivel() && getCasas()[x + 2][y - 2].getPedra() == null) {
-                            getCasas()[x + 2][y - 2].setMovimentoPossivel(true, Color.red);
-                            setNovaJogada(true);
-                        }
-                    }
-                    if (getCasas()[x + 1][y - 1].isCasaPossivel() && getCasas()[x + 1][y - 1].getPedra() == null && !reanalise) {
-                        getCasas()[x + 1][y - 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-            }
-        } else {
-            if (getCasas()[x][y].isCasaPossivel()
-                    && getCasas()[x][y].getPedra() != null
-                    && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()
-                    && getCasas()[x][y].getPedra().identificaPedra().equals("dama")
-                    && getJogadorDaVez() == 0) {
-                testaMovimentosDama(x, y, reanalise);
-            }
-        }
-
-        if (getCasas()[x][y].isCasaPossivel()
-                && getCasas()[x][y].getPedra() != null
-                && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()
-                && getJogadorDaVez() == 1
-                && getCasas()[x][y].getPedra().identificaPedra().equals("peca")) {
-            if (x > 0) {
-                if (y < 7) {
-                    if (getCasas()[x - 1][y + 1].isCasaPossivel() && getCasas()[x - 1][y + 1].getPedra() != null && getCasas()[x - 1][y + 1].getPedra().getIdOwner() != getJogadorDaVez() && y < 6 && x > 1) {
-                        if (getCasas()[x - 2][y + 2].isCasaPossivel() && getCasas()[x - 2][y + 2].getPedra() == null) {
-                            getCasas()[x - 2][y + 2].setMovimentoPossivel(true, Color.red);
-                            setNovaJogada(true);
-                        }
-                    }
-                    if (getCasas()[x - 1][y + 1].isCasaPossivel() && getCasas()[x - 1][y + 1].getPedra() == null && !reanalise) {
-                        getCasas()[x - 1][y + 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-                if (y > 0) {
-                    if (getCasas()[x - 1][y - 1].isCasaPossivel() && getCasas()[x - 1][y - 1].getPedra() != null && getCasas()[x - 1][y - 1].getPedra().getIdOwner() != getJogadorDaVez() && x > 1 && y > 1) {
-                        if (getCasas()[x - 2][y - 2].isCasaPossivel() && getCasas()[x - 2][y - 2].getPedra() == null) {
-                            getCasas()[x - 2][y - 2].setMovimentoPossivel(true, Color.red);
-                            setNovaJogada(true);
-                        }
-                    }
-                    if (getCasas()[x - 1][y - 1].getPedra() == null && !reanalise) {
-                        getCasas()[x - 1][y - 1].setMovimentoPossivel(true, Color.black);
-                    }
-                }
-            }
-        } else {
-            if (getCasas()[x][y].isCasaPossivel()
-                    && getCasas()[x][y].getPedra() != null
-                    && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()
-                    && getCasas()[x][y].getPedra().identificaPedra().equals("dama")
-                    && getJogadorDaVez() == 1) {
-                testaMovimentosDama(x, y, reanalise);
-            }
-        }
-    }
-
-    /*
-     * Metodo criado para testar todos os movimentos possiveis em todas as direcoes, usada pela pedra configurada como Dama.
-     */
-    private void testaMovimentosDama(int x, int y, boolean reanalise) {
-        int linha = x;
-        int coluna = y;
-        boolean continua = true;
-        while (getCasas()[linha++][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-            continua = estudaJogadas(linha, coluna, reanalise);
-        }
-        linha = x;
-        coluna = y;
-        continua = true;
-        while (getCasas()[linha--][coluna++].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-            continua = estudaJogadas(linha, coluna, reanalise);
-        }
-        linha = x;
-        coluna = y;
-        continua = true;
-        while (getCasas()[linha--][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-            continua = estudaJogadas(linha, coluna, reanalise);
-        }
-        linha = x;
-        coluna = y;
-        continua = true;
-        while (getCasas()[linha++][coluna--].isCasaPossivel() && linha <= 7 && coluna <= 7 && linha >= 0 && coluna >= 0 && continua) {
-            continua = estudaJogadas(linha, coluna, reanalise);
-        }
-    }
-    /*
-     * Metodo Estuda Rotina que valida todas as movimentacoes possiveis de uma pedra
-     */
-
-    private boolean estudaJogadas(int linha, int coluna, boolean reanalise) {
-        /*
-         * Primeira validacao eh responsavel por parar as analises na direcao que foi encontrado peca igual a do jogador atual
-         */
-        if (getCasas()[linha][coluna].isCasaPossivel() && getCasas()[linha][coluna].getPedra() != null && getCasas()[linha][coluna].getPedra().getIdOwner() == getJogadorDaVez()) {
-            return false;
-        }
-        /*
-         * Validacao faz a analise para so continuar analise se localizar 2 pedras seguidas
-         */
-        if (linha < 7
-                && coluna < 7
-                && linha > getOldX() && coluna > getOldY()
-                && getCasas()[linha][coluna].isCasaPossivel()
-                && getCasas()[linha][coluna].getPedra() != null
-                && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                && getCasas()[linha + 1][coluna + 1].getPedra() != null
-                && getCasas()[linha + 1][coluna + 1].isCasaPossivel()) {
-            return false;
-        } else {
-            if (linha < 7
-                    && coluna < 7
-                    && linha > getOldX() && coluna > getOldY()
-                    && getCasas()[linha][coluna].isCasaPossivel()
-                    && getCasas()[linha][coluna].getPedra() != null
-                    && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                    && getCasas()[linha + 1][coluna + 1].getPedra() == null
-                    && getCasas()[linha + 1][coluna + 1].isCasaPossivel()) {
-                getCasas()[linha + 1][coluna + 1].setMovimentoPossivel(true, Color.red);
-                setNovaJogada(true);
-                return true;
-            }
-        }
-        /*
-         * Validacao faz a analise para so continuar analise se localizar 2 pedras seguidas
-         */
-        if (linha < 7
-                && coluna > 0
-                && linha > getOldX() && coluna < getOldY()
-                && getCasas()[linha][coluna].isCasaPossivel()
-                && getCasas()[linha][coluna].getPedra() != null
-                && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                && getCasas()[linha + 1][coluna - 1].getPedra() != null
-                && getCasas()[linha + 1][coluna - 1].isCasaPossivel()) {
-            return false;
-        } else {
-            if (linha < 7
-                    && coluna > 0
-                    && linha > getOldX() && coluna < getOldY()
-                    && getCasas()[linha][coluna].isCasaPossivel()
-                    && getCasas()[linha][coluna].getPedra() != null
-                    && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                    && getCasas()[linha + 1][coluna - 1].getPedra() == null
-                    && getCasas()[linha + 1][coluna - 1].isCasaPossivel()) {
-                getCasas()[linha + 1][coluna - 1].setMovimentoPossivel(true, Color.red);
-                setNovaJogada(true);
-                return true;
-            }
-        }
-        /*
-         * Validacao faz a analise para so continuar analise se localizar 2 pedras seguidas
-         */
-        if (linha > 0
-                && coluna > 0
-                && linha < getOldX() && coluna < getOldY()
-                && getCasas()[linha][coluna].isCasaPossivel()
-                && getCasas()[linha][coluna].getPedra() != null
-                && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                && getCasas()[linha - 1][coluna - 1].getPedra() != null
-                && getCasas()[linha - 1][coluna - 1].isCasaPossivel()) {
-            return false;
-        } else {
-            if (linha > 0
-                    && coluna > 0
-                    && linha < getOldX() && coluna < getOldY()
-                    && getCasas()[linha][coluna].isCasaPossivel()
-                    && getCasas()[linha][coluna].getPedra() != null
-                    && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                    && getCasas()[linha - 1][coluna - 1].getPedra() == null
-                    && getCasas()[linha - 1][coluna - 1].isCasaPossivel()) {
-                getCasas()[linha - 1][coluna - 1].setMovimentoPossivel(true, Color.red);
-                setNovaJogada(true);
-                return true;
-            }
-        }
-        /*
-         * Validacao faz a analise para so continuar analise se localizar 2 pedras seguidas
-         */
-        if (linha > 0
-                && coluna < 7
-                && linha < getOldX() && coluna > getOldY()
-                && getCasas()[linha][coluna].isCasaPossivel()
-                && getCasas()[linha][coluna].getPedra() != null
-                && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                && getCasas()[linha - 1][coluna + 1].getPedra() != null
-                && getCasas()[linha - 1][coluna + 1].isCasaPossivel()) {
-            return false;
-        } else {
-            if (linha > 0
-                    && coluna < 7
-                    && linha < getOldX() && coluna > getOldY()
-                    && getCasas()[linha][coluna].isCasaPossivel()
-                    && getCasas()[linha][coluna].getPedra() != null
-                    && getCasas()[linha][coluna].getPedra().getIdOwner() != getJogadorDaVez()
-                    && getCasas()[linha - 1][coluna + 1].getPedra() == null
-                    && getCasas()[linha - 1][coluna + 1].isCasaPossivel()) {
-                getCasas()[linha - 1][coluna + 1].setMovimentoPossivel(true, Color.red);
-                setNovaJogada(true);
-                return true;
-            }
-        }
-        /*
-         * Caso nao tenha localizado duas perdras consecutivas
-         * em alguma das direcoes, seta casa como possivel de movimento.
-         */
-        if (getCasas()[linha][coluna].getPedra() == null && !reanalise) {
-            getCasas()[linha][coluna].setMovimentoPossivel(true, Color.cyan);
-            if (!reanalise) {
-                System.out.println("Analise em todas as direcoes");
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /*
-     * remove e pedra
-     */
-    private void retiraPeca(int x, int y) {
-        getCasas()[x][y].retiraPedra();
-        getCasas()[x][y].setForeground(getCasas()[x][y].getBackground());
-    }
-
-    /*
-     * Metodo criado para desmarcar as casas possiveis selecionadas.
-     */
-    private void hideMovimentosPossiveis() {
-        for (int linha = 0; linha
-                < 8; linha++) {
-            for (int coluna = 0; coluna
-                    < 8; coluna++) {
-                getCasas()[coluna][linha].setMovimentoPossivel(false, getCorCasaEscura());
-            }
-        }
-    }
-
-    private void hideCasaSelecionada() {
-        /*
-         * Metodo desativaSelecao - Metodo utilizado para desabilitar a
-         * selecao apos a jogada ou caso selecionado outra pedra
-         */
-        for (int linha = 0; linha
-                < 8; linha++) {
-            for (int coluna = 0; coluna
-                    < 8; coluna++) {
-                getCasas()[linha][coluna].setCasaSelecionada(false, getCorCasaEscura());
-                setOldX(-1);
-                setOldY(-1);
-            }
-        }
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
-    }
-
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    /**
-     * @return the xSelecionado
-     */
-    public int getOldX() {
-        return oldX;
-    }
-
-    /**
-     * @param xSelecionado the xSelecionado to set
-     */
-    public void setOldX(int oldX) {
-        this.oldX = oldX;
-    }
-
-    /**
-     * @return the ySelecionado
-     */
-    public int getOldY() {
-        return oldY;
-    }
-
-    /**
-     * @param ySelecionado the ySelecionado to set
-     */
-    public void setOldY(int oldY) {
-        this.oldY = oldY;
-    }
-
-    private void mudarJogadorVez() {
-        if (getJogadorDaVez() == 1) {
-            setJogadorDaVez(0);
-        } else {
-            setJogadorDaVez(1);
-        }
-    }
-
-    /**
-     * @return the jogadorDaVez
-     */
-    private int getJogadorDaVez() {
-        return jogadorDaVez;
-    }
-
-    /**
-     * @param jogadorDaVez the jogadorDaVez to set
-     */
-    private void setJogadorDaVez(int jogadorDaVez) {
-        this.jogadorDaVez = jogadorDaVez;
-    }
+//    public void mouseReleased(MouseEvent e) {
+//        /*
+//         * Evento que dispara quando o botao do mouse e solto.
+//         *
+//         * super.getWidth serve para pegar a largura do componente
+//         *
+//         * super.getHeight serve para pegar a altura do componente
+//         *
+//         * A divisao por 8 e necessaria por que temos 8 casas
+//         *
+//         * Y esta recebendo testaMovimentos e X esta recebendo Y por que o mouseEvent interte isso, pra nos ajudar, claro.
+//         * Atraves destes testes, leitura de documentacoes
+//         * http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/MouseEvent.html
+//         * indentificamos que o MouseEvent retorna X como sendo linha e o Y como sendo coluna.
+//         * Invertendo as posicoes, tudo se resolveu.
+//         *
+//         *
+//         * O valor de ajuste igual a 20, quando subtraido da linha, temos uma maior precisao
+//         * no calculo nos possibilitando clicar bem proximo da borda da casa sem que ele pegue
+//         * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
+//         *
+//         */
+//
+//        int y = (e.getX()) / (super.getWidth() / 8);
+//        int x = (e.getY() - valAjusteClick) / (super.getHeight() / 8);
+//        int pecaClick = - 1;
+//        /*
+//         * Variavel abaixo usada para configurar a reanalise dos movimentos
+//         */
+//        boolean reAnaliseMovimento = false;
+//        /*
+//         * Metodo set da rotina que configura novaJogada
+//         */
+//        setNovaJogada(false);
+//        /*
+//         * Rotina abaixo remover que foram "comidas" pelo adversario
+//         */
+//        if (getCasas()[x][y].isMovimentoPossivel()) {
+//            /*
+//             * Calculo usado para saber se o movimento realizado foi de mais de uma casa
+//             * Caso posivito, entra na rotina de analise de possiveis pecas comidas
+//             */
+//            if (Math.abs(getOldY() - y) >= 2) {
+//                int l = getOldX(), c = getOldY();
+//                if (x > l && y > c) {
+//                    while (getCasas()[l++][c++].isCasaPossivel()
+//                            && l < x
+//                            && c < y) {
+//                        retiraPeca(l, c);
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x > l && y < c) {
+//                    while (getCasas()[l++][c--].isCasaPossivel()
+//                            && l < x
+//                            && c > y) {
+//                        retiraPeca(l, c);
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x < l && y > c) {
+//                    while (getCasas()[l--][c++].isCasaPossivel()
+//                            && l > x
+//                            && c < y) {
+//                        retiraPeca(l, c);
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x < l && y < c) {
+//                    while (getCasas()[l--][c--].isCasaPossivel()
+//                            && l > x
+//                            && c > y) {
+//                        retiraPeca(l, c);
+//                    }
+//                }
+//                /*
+//                 * Rotina de movimentacao da peca, da origem pro destino
+//                 */
+//                move(getOldX(), getOldY(), x, y);
+//                setOldX(x);
+//                setOldY(y);
+//                reAnaliseMovimento = true;
+//                /*
+//                 * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
+//                 */
+//                analistaTipoMovimento(x, y, reAnaliseMovimento);
+//            } else {
+//                /*
+//                 * Simples rotina de movimento, sem acao de comer
+//                 */
+//                move(getOldX(), getOldY(), x, y);
+//            }
+//            /*
+//             * Controla vez do jgoador
+//             */
+//            if (!isNovaJogada()) {
+//                mudarJogadorVez();
+//                reAnaliseMovimento = false;
+//            }
+//        }
+//        /*
+//         * Limpa casas selecionads
+//         */
+//        hideCasaSelecionada();
+//        /*
+//         * limpa Movimentos selecionados
+//         */
+//        hideMovimentosPossiveis();
+//
+//        if (getCasas()[x][y].isCasaPossivel()
+//                && getCasas()[x][y].getPedra() != null
+//                && getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
+//            /*
+//             * seta como selecionada a casa, pintando sua borda
+//             */
+//            getCasas()[x][y].setCasaSelecionada(true, Color.black);
+//            setOldX(x);
+//            setOldY(y);
+//            analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
+//        }
+//    }
 
     /**
      * @return the corCasaClara
@@ -688,7 +317,7 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
     /**
      * @return the corCasaEscura
      */
-    private Color getCorCasaEscura() {
+    public Color getCorCasaEscura() {
         return corCasaEscura;
     }
 
@@ -739,20 +368,6 @@ public class Tabuleiro extends JInternalFrame implements MouseListener {
      */
     public void setTabuleiroGBConstraints(GridBagConstraints tabuleiroGBConstraints) {
         this.tabuleiroGBConstraints = tabuleiroGBConstraints;
-    }
-
-    /**
-     * @return the novaJogada
-     */
-    public boolean isNovaJogada() {
-        return novaJogada;
-    }
-
-    /**
-     * @param novaJogada the novaJogada to set
-     */
-    public void setNovaJogada(boolean novaJogada) {
-        this.novaJogada = novaJogada;
     }
 
     /**
