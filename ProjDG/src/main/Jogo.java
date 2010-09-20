@@ -19,8 +19,7 @@ import service.Tabuleiro;
 
 public class Jogo extends JFrame {
 
-    private static Jogador jogador1, jogador2;
-    private Jogador[] jogadores;
+    private static Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
     private ActionListener action;
@@ -47,9 +46,6 @@ public class Jogo extends JFrame {
          * Inicializando o jogo
          */
         tabuleiro = new Tabuleiro();
-        jogadores = new Jogador[2]; //criando objeto jogadores
-        jogadores[0] = jogador1; //atribindo valores ao jogador 1
-        jogadores[1] = jogador2; //atribindo valores ao jogador 2
         placar = new Placar(jogador1, jogador2);
         distribuirPedras();
         posicionarPedras(jogador1);
@@ -73,9 +69,10 @@ public class Jogo extends JFrame {
      */
     public static void main(String[] args) {
         System.out.println("Iniciando Damas");
-        jogador1 = new Jogador("Player 1", 0, 0);
-        jogador2 = new Jogador("Player 2", 1, 40);
-        Jogo mainFrame = new Jogo(jogador1, jogador2);
+        jogadores = new Jogador[2];
+        setJogadores(0, new Jogador("Player 1", 0, 0)); //criando objeto jogadores
+        setJogadores(1, new Jogador("Player 2", 1, 40)); //criando objeto jogadores
+        Jogo mainFrame = new Jogo(getJogadores()[0], getJogadores()[1]);
         mainFrame.setSize(908, 700);
         mainFrame.setVisible(true);
     }
@@ -163,15 +160,15 @@ public class Jogo extends JFrame {
     /**
      * @return the jogadores
      */
-    public Jogador[] getJogadores() {
+    public static Jogador[] getJogadores() {
         return jogadores;
     }
 
     /**
      * @param jogadores the jogadores to set
      */
-    public void setJogadores(Jogador[] jogadores) {
-        this.jogadores = jogadores;
+    public static void setJogadores(int idx, Jogador j) {
+        jogadores[idx] = j;
     }
 
     /**
