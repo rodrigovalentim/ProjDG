@@ -598,7 +598,7 @@ public class Jogo extends JFrame {
     }
 
     /**
-     * @param jogadores the jogadores to set
+     * @param j the jogadores to set
      */
     public void setJogadores(int idx, Jogador j) {
         jogadores[idx] = j;
@@ -647,14 +647,14 @@ public class Jogo extends JFrame {
     }
 
     /**
-     * @param xSelecionado the xSelecionado to set
+     * @param oldX the oldX to set
      */
     public void setOldX(int oldX) {
         this.oldX = oldX;
     }
 
     /**
-     * @return the xSelecionado
+     * @return the oldX
      */
     public int getOldX() {
         return oldX;
@@ -668,7 +668,7 @@ public class Jogo extends JFrame {
     }
 
     /**
-     * @param ySelecionado the ySelecionado to set
+     * @param oldY the oldY to set
      */
     public void setOldY(int oldY) {
         this.oldY = oldY;

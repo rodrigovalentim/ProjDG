@@ -106,7 +106,7 @@ public class Casa extends javax.swing.JPanel {
     }
 
     /**
-     * @param casaSelecionada the casaSelecionada to set
+     * @param selecionada the casaSelecionada to set
      */
     public void setCasaSelecionada(boolean selecionada, Color cor) {
         this.setCorSelecionado(cor); //Setando cor da casa selecionada
@@ -176,9 +176,9 @@ public class Casa extends javax.swing.JPanel {
     /**
      * @param movimentoPossivel the movimentoPossivel to set
      */
-    public void setMovimentoPossivel(boolean m, Color c) {
+    public void setMovimentoPossivel(boolean movimentoPossivel, Color c) {
         setCorPossivel(c);
-        this.movimentoPossivel = m;
+        this.movimentoPossivel = movimentoPossivel;
         repaint();
     }
 
@@ -192,8 +192,8 @@ public class Casa extends javax.swing.JPanel {
     /**
      * @param corPossivel the corPossivel to set
      */
-    public void setCorPossivel(Color c) {
-        this.corMovimentosPossiveis = c;
+    public void setCorPossivel(Color corPossivel) {
+        this.corMovimentosPossiveis = corPossivel;
     }
 
     /**
