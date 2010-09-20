@@ -1,7 +1,9 @@
 package service;
 
+import java.awt.Component;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 public class Placar extends JInternalFrame {
@@ -14,8 +16,9 @@ public class Placar extends JInternalFrame {
         setJogador1(jogador1);
         setJogador2(jogador2);
         setBounds(702, 0, 200, 400);
-        resultado = new JTextArea("Jogador 1: " + getJogador1().getNome() + " Pontos: " + getJogador1().getPontos() + "\n" + "Jogador 2: " + getJogador2().getNome() + " Pontos: " + getJogador2().getPontos());
+        resultado = new JTextArea();
         this.getContentPane().add(resultado);
+        atualizarPlacar();
         setTitle("Placar");
     }
 
@@ -44,10 +47,20 @@ public class Placar extends JInternalFrame {
         this.jogador2 = jogador2;
     }
 
-    public void atualizarPlacar() {
-        for (int x = 0; x < getJogador1().getPedras().size(); x++) {
-            
+    public void verificaVencedor(Component parent) {
+        if (jogador1.getPontos() == 12) {
+            JOptionPane.showMessageDialog(parent, "Parabens ao jogador " + getJogador1().getNome() + "!!\n" + "Comeu Todas as Pecas do jogador " + getJogador2().getNome());
         }
-        System.out.println(jogador1.getNome() + " = " + jogador1.getPontos() + "\n" + jogador2.getNome() + " = " + jogador2.getPontos());
+        if (jogador2.getPontos() == 12) {
+            JOptionPane.showMessageDialog(parent, "Parabens ao jogador " + getJogador1().getNome() + "!!\n" + "Comeu Todas as Pecas do jogador " + getJogador2().getNome());
+        }
+        /*( jogo.tabuleiro,
+        "DamasJ \n\n Jogo de Damas implementado para a disciplina de Prog V\n" +
+        "- Profesor Rolf F. Molz\nDiscentes:\n  => Eduardo Shoedles\n  => Marcelo Ivan Martin",
+        "Sobre", JOptionPane.INFORMATION_MESSAGE);*/
+    }
+
+    public void atualizarPlacar() {
+        resultado.setText(jogador1.getNome() + " = " + jogador1.getPontos() + "\n" + jogador2.getNome() + " = " + jogador2.getPontos());
     }
 }

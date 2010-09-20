@@ -21,15 +21,16 @@ public class Jogo extends JFrame {
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
-    private static final int valAjusteClick = 30;
+    private static final int valAjusteClick = 10;
     private boolean novaJogada;
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
+//    private ArrayList<Pedra> pedrasCapturadas;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
         /*
-         * Construindo parte grafica
+         * Colocando titulo na tela principal
          */
         super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
         final JDesktopPane guiDamas = new JDesktopPane();
@@ -63,7 +64,7 @@ public class Jogo extends JFrame {
         getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
         getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
         /*
-         * Inicializando Variaveis
+         * Inicializando Listener para ouvir o click do mouse
          */
         getTabuleiro().addMouseListener(new MouseAdapter() {
 
@@ -120,7 +121,9 @@ public class Jogo extends JFrame {
                     while (getTabuleiro().getCasas()[l++][c++].isCasaPossivel()
                             && l < x
                             && c < y) {
-                        retiraPeca(l, c);
+                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+                            retiraPeca(l, c);
+                        }
                     }
                 }
                 l = getOldX();
@@ -129,7 +132,9 @@ public class Jogo extends JFrame {
                     while (getTabuleiro().getCasas()[l++][c--].isCasaPossivel()
                             && l < x
                             && c > y) {
-                        retiraPeca(l, c);
+                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+                            retiraPeca(l, c);
+                        }
                     }
                 }
                 l = getOldX();
@@ -138,7 +143,9 @@ public class Jogo extends JFrame {
                     while (getTabuleiro().getCasas()[l--][c++].isCasaPossivel()
                             && l > x
                             && c < y) {
-                        retiraPeca(l, c);
+                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+                            retiraPeca(l, c);
+                        }
                     }
                 }
                 l = getOldX();
@@ -147,7 +154,9 @@ public class Jogo extends JFrame {
                     while (getTabuleiro().getCasas()[l--][c--].isCasaPossivel()
                             && l > x
                             && c > y) {
-                        retiraPeca(l, c);
+                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+                            retiraPeca(l, c);
+                        }
                     }
                 }
                 /*
@@ -302,8 +311,11 @@ public class Jogo extends JFrame {
      * remove e pedra
      */
     private void retiraPeca(int x, int y) {
+        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
         getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
+        getPlacar().atualizarPlacar();
+        getPlacar().verificaVencedor(this);
     }
 
     /*
