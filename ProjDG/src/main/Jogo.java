@@ -68,6 +68,9 @@ public class Jogo extends JFrame {
         initialize();
     }
 
+    /*
+     * Startando processo
+     */
     public static void main(String[] args) {
         System.out.println("Iniciando Damas");
         jogador1 = new Jogador("Player 1", 0, 0);
