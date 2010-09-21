@@ -29,14 +29,6 @@ public abstract class Pedra {
         this.cor = cor;
     }
 
-//    public int[] getPosicao(){
-//        return posicao;
-//    }
-
-//    public void setPosicao(int[] posicao) {
-//        this.posicao = posicao;
-//    }
-
     public abstract String identificaPedra();
 
     /**

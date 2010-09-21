@@ -212,10 +212,10 @@ public class Jogo extends JFrame {
 
     public void distribuirPedras() {
         for (int i = 1; i <= 12; i++) {
-            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.black));
+            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white));
         }
         for (int i = 13; i <= 24; i++) {
-            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.white));
+            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.black));
         }
     }
 

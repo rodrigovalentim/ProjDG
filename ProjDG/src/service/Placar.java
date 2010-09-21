@@ -52,7 +52,7 @@ public class Placar extends JInternalFrame {
             JOptionPane.showMessageDialog(parent, "Parabens ao jogador " + getJogador1().getNome() + "!!\n" + "Comeu Todas as Pecas do jogador " + getJogador2().getNome());
         }
         if (jogador2.getPontos() == 12) {
-            JOptionPane.showMessageDialog(parent, "Parabens ao jogador " + getJogador1().getNome() + "!!\n" + "Comeu Todas as Pecas do jogador " + getJogador2().getNome());
+            JOptionPane.showMessageDialog(parent, "Parabens ao jogador " + getJogador2().getNome() + "!!\n" + "Comeu Todas as Pecas do jogador " + getJogador1().getNome());
         }
         /*( jogo.tabuleiro,
         "DamasJ \n\n Jogo de Damas implementado para a disciplina de Prog V\n" +
