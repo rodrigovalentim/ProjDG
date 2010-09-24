@@ -10,6 +10,7 @@ package control;
 import java.awt.*;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import service.Jogador;
 import service.Peca;
@@ -26,6 +27,7 @@ public class Jogo extends JFrame {
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
+    private ArrayList plus;
 //    private ArrayList<Pedra> pedrasCapturadas;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
@@ -680,5 +682,19 @@ public class Jogo extends JFrame {
         } else {
             setJogadorDaVez(1);
         }
+    }
+
+    /**
+     * @return the plus
+     */
+    public ArrayList getPlus() {
+        return plus;
+    }
+
+    /**
+     * @param plus the plus to set
+     */
+    public void setPlus(ArrayList plus) {
+        this.plus = plus;
     }
 }
