@@ -27,7 +27,6 @@ public class Jogo extends JFrame {
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
-    private ArrayList plus;
 //    private ArrayList<Pedra> pedrasCapturadas;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
