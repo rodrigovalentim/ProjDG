@@ -682,18 +682,4 @@ public class Jogo extends JFrame {
             setJogadorDaVez(1);
         }
     }
-
-    /**
-     * @return the plus
-     */
-    public ArrayList getPlus() {
-        return plus;
-    }
-
-    /**
-     * @param plus the plus to set
-     */
-    public void setPlus(ArrayList plus) {
-        this.plus = plus;
-    }
 }
