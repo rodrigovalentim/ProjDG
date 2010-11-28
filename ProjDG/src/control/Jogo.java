@@ -7,30 +7,33 @@
  */
 package control;
 
-import java.awt.*;
+import exception.ListaVaziaException;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import networkgame.clienteserver.Cliente;
+import networkgame.clienteserver.ServicoCliente;
+import networkgame.servidor.Servico;
 import service.Jogador;
 import service.Peca;
 import service.Placar;
-import javax.swing.JOptionPane;
-import networkgamer.clientserv.Cliente;
-import networkgamer.clientserv.ServicoCliente;
-import networkgamer.clientserv.Servidor;
 import service.Tabuleiro;
+import utils.imageLoader;
 
-public class Jogo extends JFrame {
+public class Jogo extends JFrame implements ServicoCliente {
 
-    private Cliente cliente;
-    private Servidor servidor;
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
@@ -39,73 +42,32 @@ public class Jogo extends JFrame {
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
-    private ServicoCliente sCliente;
+    private Cliente cliente;
+    private static BufferedImage imagem;
+    private final String pecaClara = "pecaclara.png";
+    private final String pecaEscura = "pecaescura.png";
 
-    public Jogo(Jogador jogador1, Jogador jogador2) {
+    public Jogo(final Jogador jogador1, final Jogador jogador2) {
+
         /*
          * Colocando titulo na tela principal
          */
         super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
-        final JDesktopPane guiDamas = new JDesktopPane();
+        URL caminho = getClass().getClassLoader().getResource("img");
+        imagem = new imageLoader().imageLoader("img.png");
+        final JDesktopPane guiDamas = new JDesktopPane() {
+
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (imagem != null) {
+                    g.drawImage(imagem, 0, 0, this.getWidth(), this.getHeight(), this);
+                } else {
+                    g.drawString("Image not found", 50, 50);
+                }
+            }
+        };
         getContentPane().add(guiDamas);
         setResizable(false); //impossibilitando o resize
-        /*
-         * Criando Menu
-         */
-        JMenuBar menu = new JMenuBar();
-        setJMenuBar(menu);
-        /*
-         * Criando Menu Jogo
-         */
-        JMenu menuJogo = new JMenu("Jogo");
-        menuJogo.setMnemonic('J');
-        /*
-         * Criando ItemMenu Sair
-         */
-        JMenuItem mItemSair = new JMenuItem("Sair");
-        mItemSair.setMnemonic('S');
-        mItemSair.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                System.exit(0);
-            }
-        });
-        menuJogo.add(mItemSair);
-
-        /*
-         * Criando Menu Rede
-         */
-        JMenu menuRede = new JMenu("Rede");
-        menuJogo.setMnemonic('R');
-        /*
-         * Criando ItemMenu Servidor
-         */
-        JMenuItem mItemCliente = new JMenuItem("Cliente");
-        mItemCliente.setMnemonic('C');
-        mItemCliente.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                inicializarCliente(guiDamas);
-            }
-        });
-        menuRede.add(mItemCliente);
-        /*
-         * Criando ItemMenu Servidor
-         */
-        JMenuItem mItemServidor = new JMenuItem("Servidor");
-        mItemServidor.setMnemonic('E');
-        mItemServidor.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                setServidor(new Servidor(8989));
-                getServidor().iniciaServidor();
-            }
-        });
-        menuRede.add(mItemServidor);
-
-        menu.add(menuJogo);
-        menu.add(menuRede);
         /*
          * Escutador do click do botao close para fechar o jogo.
          */
@@ -120,53 +82,140 @@ public class Jogo extends JFrame {
         /*
          * Inicializando Variaveis
          */
+        JMenuBar menu = new JMenuBar();
+        setJMenuBar(menu);
+
+        JMenu menuJogo = new JMenu("Jogo");
+        menuJogo.setMnemonic('J');
+
+        menuJogo.addSeparator();
+
+        JMenuItem mItemNovo = new JMenuItem("Jogo Local");
+        mItemNovo.setMnemonic('N');
+        mItemNovo.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+        menuJogo.add(mItemNovo);
+        menuJogo.addSeparator();
+
+        JMenuItem mItemSair = new JMenuItem("Sair");
+        mItemSair.setMnemonic('S');
+        mItemSair.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        dispose();
+                        System.exit(0);
+                    }
+                });
+        menuJogo.add(mItemSair);
+        menu.add(menuJogo);
+        JMenu menuConexao = new JMenu("Conexão");
+        menuJogo.setMnemonic('C');
+        JMenuItem mItemServidor = new JMenuItem("Iniciar Servidor");
+        mItemServidor.setMnemonic('S');
+        mItemServidor.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        new Servico().iniciaServidor();
+                    }
+                });
+        menuConexao.add(mItemServidor);
+
+        JMenuItem mItemCliente = new JMenuItem("Iniciar Cliente");
+        mItemCliente.setMnemonic('C');
+        mItemCliente.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        String ip = JOptionPane.showInputDialog(null,
+                                "Informe o IP do Servidor",
+                                "Endere?o do Servidor",
+                                JOptionPane.QUESTION_MESSAGE);
+                        iniciaCliente(guiDamas, jogador1, jogador2, ip);
+                    }
+                });
+        menuConexao.add(mItemCliente);
+        menuConexao.addSeparator();
+        menu.add(menuConexao);
+
         this.setOldX(-1);
         this.setOldY(-1);
         setJogadorDaVez(0); //Jogador da Vez - Inicia com o jogador 0
         jogadores = new Jogador[2];
+
         setJogadores(jogador1.getId(), jogador1);
+
         setJogadores(jogador2.getId(), jogador2);
-        tabuleiro = new Tabuleiro();
-        placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
-        distribuirPedras();
-        posicionarPedras(getJogadores()[jogador1.getId()]);
-        posicionarPedras(getJogadores()[jogador2.getId()]);
 
-        /*
-         * Inicializando Listener para ouvir o click do mouse
-         */
-        getTabuleiro().addMouseListener(new MouseAdapter() {
-
-            public void mouseReleased(MouseEvent mouseEvent) {
-                capturaClicks(mouseEvent);
-            }
-        });
     }
 
-    public void inicializarCliente(JDesktopPane desktopPane) {
-        String ip = null;
-        int porta = -1;
+    public void iniciaCliente(JDesktopPane guiDamas, Jogador jogador1, Jogador jogador2, String ip) {
+        if (!ip.equals("")) {
+            cliente = new Cliente(this);
+            tabuleiro = new Tabuleiro();
+            placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
+            distribuirPedras();
+            posicionarPedras(getJogadores()[jogador1.getId()]);
+            posicionarPedras(getJogadores()[jogador2.getId()]);
+            getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
+            getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
+                /*
+             * Inicializando Listener para ouvir o click do mouse
+             */
+            getTabuleiro().addMouseListener(new MouseAdapter() {
 
-        setCliente(new Cliente(sCliente));
-        try {
-            porta = Integer.parseInt(JOptionPane.showInputDialog(null, "Informe uma porta para conexao", "Porta do Servidor", JOptionPane.QUESTION_MESSAGE));
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(this, "Porta incorreta", "Erro", JOptionPane.ERROR_MESSAGE);
-        }
-        if (porta > 0) {
-            ip = JOptionPane.showInputDialog(null, "Informe o IP do Servidor", "Endereco do Servidor", JOptionPane.QUESTION_MESSAGE);
-            getTabuleiro().mostra(desktopPane); //Exibe o tabuleiro na tela principal
-            getPlacar().mostra(desktopPane); //Exibe o placar na tela principal
-        }
-        if (ip != null && porta > 0) {
+                public void mouseReleased(MouseEvent mouseEvent) {
+                    capturaClicks(mouseEvent);
+                }
+            });
             try {
-                getCliente().iniciaCliente(ip, porta);
+                cliente.iniciaCliente(ip, 1235);
             } catch (UnknownHostException ex) {
                 Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            JOptionPane.showInputDialog(null,
+                    "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                    "Erro!",
+                    JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void capturaMensagem(String mensagem) {
+        String[] dados = mensagem.split(",");
+        if (dados.length > 2) {
+            setOldX(Integer.parseInt(dados[4]));
+            setOldY(Integer.parseInt(dados[5]));
+            servidorMove(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3]));
+            mudarJogadorVez();
+        } else {
+            servidorRetiraPeca(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
+        }
+    }
+
+    private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
+        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getForeground());
+        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
+        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
+            setDama(linhaCasaDestino, colunaCasaDestino);
+        }
+    }
+
+    private void servidorRetiraPeca(int x, int y) {
+        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
+        getTabuleiro().getCasas()[x][y].retiraPedra();
+        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
+        getPlacar().atualizarPlacar();
+        getPlacar().verificaVencedor(this);
     }
 
     public void capturaClicks(MouseEvent e) {
@@ -287,7 +336,6 @@ public class Jogo extends JFrame {
          * limpa Movimentos selecionados
          */
         hideMovimentosPossiveis();
-
         if (getTabuleiro().getCasas()[x][y].isCasaPossivel()
                 && getTabuleiro().getCasas()[x][y].getPedra() != null
                 && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
@@ -307,10 +355,10 @@ public class Jogo extends JFrame {
 
     public void distribuirPedras() {
         for (int i = 1; i <= 12; i++) {
-            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white));
+            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white, pecaClara));
         }
         for (int i = 13; i <= 24; i++) {
-            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.black));
+            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.black, pecaEscura));
         }
     }
 
@@ -352,13 +400,16 @@ public class Jogo extends JFrame {
                  */
                 if ((getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].isCasaPossivel())
                         && (getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].getPedra() == null)) {
-                    /*
-                     * setando as pecas que estao na mao do jogador na casa informada como possivel
-                     */
-                    getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].setPedra(getJogadores()[jogador.getId()].getPedras().get(pecas));
-                    /*
-                     * BREAK 
-                     * O Break foi usado para quando a condicao for atendida, 
+                    try {
+                        /*
+                         * setando as pecas que estao na mao do jogador na casa informada como possivel
+                         */
+                        getTabuleiro().getCasas()[((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) / 8)][((getJogadores()[jogador.getId()].getPosicaoInicial() + qtdCasas) % 8)].setPedra(getJogadores()[jogador.getId()].getPedras().buscar(pecas));
+                    } catch (ListaVaziaException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                    } /*
+                     * BREAK
+                     * O Break foi usado para quando a condicao for atendida,
                      * sair do loop e ir para proxima casa, pegando o proximo ID da peca
                      */
                     break;
@@ -376,18 +427,20 @@ public class Jogo extends JFrame {
      * Caso a casa de destino seja a primeira linha superior (posicao 0 do array) ou inferior (posicao 7 do array)
      * O metodo promovePedra eh chamado.
      */
-    private void move(int linhaCasaOrigem, int ColunaCasaOrigem, int LinhaCasaDestino, int ColunaCasaDestino) {
-        getTabuleiro().getCasas()[LinhaCasaDestino][ColunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][ColunaCasaOrigem].getPedra());
-        getTabuleiro().getCasas()[linhaCasaOrigem][ColunaCasaOrigem].retiraPedra();
-        getTabuleiro().getCasas()[LinhaCasaDestino][ColunaCasaDestino].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getForeground());
-        getTabuleiro().getCasas()[linhaCasaOrigem][ColunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
-        if (((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (LinhaCasaDestino == 0))) {
-            setDama(LinhaCasaDestino, ColunaCasaDestino);
-        }
+    private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
+        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[getOldX()][getOldY()].getImagemAreaCasa());
+        //getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
         try {
-            getCliente().enviaMensagem("mover");
+            cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
+                    + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
+                    + String.valueOf(getOldX()) + "," + String.valueOf(getOldY()));
         } catch (IOException ex) {
-            Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
+        }
+        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
+            setDama(linhaCasaDestino, colunaCasaDestino);
         }
     }
 
@@ -416,16 +469,19 @@ public class Jogo extends JFrame {
         getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
         getPlacar().atualizarPlacar();
         getPlacar().verificaVencedor(this);
+        try {
+            cliente.enviaMensagem(String.valueOf(x) + "," + String.valueOf(y));
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
+        }
     }
 
     /*
      * Metodo criado para desmarcar as casas possiveis selecionadas.
      */
     private void hideMovimentosPossiveis() {
-        for (int linha = 0; linha
-                < 8; linha++) {
-            for (int coluna = 0; coluna
-                    < 8; coluna++) {
+        for (int linha = 0; linha < 8; linha++) {
+            for (int coluna = 0; coluna < 8; coluna++) {
                 getTabuleiro().getCasas()[coluna][linha].setMovimentoPossivel(false, getTabuleiro().getCorCasaEscura());
             }
         }
@@ -560,8 +616,7 @@ public class Jogo extends JFrame {
          */
         if (getTabuleiro().getCasas()[linha][coluna].isCasaPossivel() && getTabuleiro().getCasas()[linha][coluna].getPedra() != null && getTabuleiro().getCasas()[linha][coluna].getPedra().getIdOwner() == getJogadorDaVez()) {
             return false;
-        }
-        /*
+        } /*
          * Validacao faz a analise para so continuar analise se localizar 2 pedras seguidas
          */
         if (linha < 7
@@ -583,7 +638,8 @@ public class Jogo extends JFrame {
                     && getTabuleiro().getCasas()[linha + 1][coluna + 1].getPedra() == null
                     && getTabuleiro().getCasas()[linha + 1][coluna + 1].isCasaPossivel()) {
                 getTabuleiro().getCasas()[linha + 1][coluna + 1].setMovimentoPossivel(true, Color.red);
-                setNovaJogada(true);
+                setNovaJogada(
+                        true);
                 return true;
             }
         }
@@ -780,33 +836,5 @@ public class Jogo extends JFrame {
         } else {
             setJogadorDaVez(1);
         }
-    }
-
-    /**
-     * @return the cliente
-     */
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    /**
-     * @param cliente the cliente to set
-     */
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    /**
-     * @return the servidor
-     */
-    public Servidor getServidor() {
-        return servidor;
-    }
-
-    /**
-     * @param servidor the servidor to set
-     */
-    public void setServidor(Servidor servidor) {
-        this.servidor = servidor;
     }
 }

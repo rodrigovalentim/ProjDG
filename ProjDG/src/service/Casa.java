@@ -3,7 +3,10 @@ package service;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import model.Pedra;
+import utils.imageLoader;
 
 public class Casa extends javax.swing.JPanel {
 
@@ -15,15 +18,19 @@ public class Casa extends javax.swing.JPanel {
     private boolean casaSelecionada; //indica casa selecionada
     private boolean movimentoPossivel;
     private Graphics layoutCasa; //layout da casa
+    private BufferedImage imagem;
+    private BufferedImage imagemAreaCasa;
 
-    public Casa(int id, Color cor, boolean possivel) {
+    public Casa(int id, Color cor, boolean possivel, String imgString) {
         setId(id);
         setCasaSelecionada(false, null);
         setLayoutCasa(null);
-        this.setBackground(cor);
-        this.setForeground(cor);
         setMovimentoPossivel(false, null);
         setCasaPossivel(possivel);
+        this.setBackground(cor);
+        this.setForeground(cor);
+        imagem = new imageLoader().imageLoader(imgString);
+        setImagemAreaCasa(new imageLoader().imageLoader(imgString));
     }
 
     public void paintComponent(Graphics graphics) {
@@ -32,6 +39,8 @@ public class Casa extends javax.swing.JPanel {
          * super.paintComponent(g);  - chamando construtor do JPanel, swing lhe ajuda a desenhar a tela
          */
         super.paintComponent(graphics);
+        Graphics2D graphics2D = (Graphics2D) graphics.create();
+        graphics2D.drawImage(getImagem(), 0, 0, this.getWidth(), this.getHeight(), this);
         /*
          * fillOval - Preenche uma area oval delimitada pelo retangulo especificado e com a cor atual configurada.
          * a cor configurada esta sendo setada a cor da pedra
@@ -42,7 +51,7 @@ public class Casa extends javax.swing.JPanel {
          * os valores subtraidos da altura e largura, foi definido como 10 para nao ficar uma pedra muito grande.
          *
          */
-        graphics.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
+        //graphics.fillOval(5, 5, super.getWidth() - 10, super.getHeight() - 10);
         /*
          * isCasaSelecionada - Ao selecionar, a borda sera pintada da cor escolhida
          * a rotina drawRect pinta o quadrado completo, precisando apenas reduzir
@@ -53,8 +62,6 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.setColor(getCorSelecionado());
             layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
             layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
-            layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
-            layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
         /*
          * Pinta possiveis casas que podem ser movimentadas
@@ -63,18 +70,17 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.setColor(getCorPossivel());
             layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
             layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
-            layoutCasa.drawRect(2, 2, super.getWidth() - 5, super.getHeight() - 5);
-            layoutCasa.drawRect(3, 3, super.getWidth() - 7, super.getHeight() - 7);
         }
         /*
          * Atualiza cor da pedra
          */
         if (getPedra() != null) {
-            setForeground(getPedra().getCor());
+        //    setForeground(getPedra().getCor());
+
         }
 
         if (getPedra() != null && getPedra().identificaPedra().equals("dama")) {
-            layoutCasa.setColor(getBackground());
+           // layoutCasa.setColor(getBackground());
             /*
              * Calculo exato para pintar o centro das pedras de acordo com a cor do jogador
              */
@@ -92,9 +98,12 @@ public class Casa extends javax.swing.JPanel {
 
     public void setPedra(Pedra pedra) {
         this.pedra = pedra;
+        this.setImagem(pedra.getImagem());
     }
 
     public void retiraPedra() {
+        this.setImagem(getImagemAreaCasa());
+        this.repaint();
         this.setPedra(null);
     }
 
@@ -208,5 +217,34 @@ public class Casa extends javax.swing.JPanel {
      */
     public void setCasaPossivel(boolean possivel) {
         this.casaPossivel = possivel;
+    }
+
+    /**
+     * @return the imagemAreaCasa
+     */
+    public BufferedImage getImagemAreaCasa() {
+        return imagemAreaCasa;
+    }
+
+    /**
+     * @param imagemAreaCasa the imagemAreaCasa to set
+     */
+    public void setImagemAreaCasa(BufferedImage imagemAreaCasa) {
+        this.imagemAreaCasa = imagemAreaCasa;
+    }
+
+    /**
+     * @return the imagem
+     */
+    public BufferedImage getImagem() {
+        return imagem;
+    }
+
+    /**
+     * @param imagem the imagem to set
+     */
+    public void setImagem(BufferedImage imagem) {
+        this.imagem = imagem;
+        this.repaint();
     }
 }

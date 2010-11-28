@@ -1,19 +1,20 @@
 package service;
 
-import java.util.ArrayList;
+import estruturas.ListaEncadeada;
+import exception.ListaVaziaException;
 import model.Pedra;
 
 public class Jogador {
     private int id;
     private String nome;
-    private ArrayList<Pedra> pedras;
+    private ListaEncadeada pedras;
     private int pontos;
     private int posicaoInicial;
 
     public Jogador(String nome, int idJogador, int pos){
         setNome(nome);
         setId(idJogador);
-        pedras = new ArrayList<Pedra>();
+        pedras = new ListaEncadeada();
         setPontos(0);
         setPosicaoInicial(pos);
         System.out.println("Jogador "+getNome()+" Posicao inicial "+pos);
@@ -27,16 +28,16 @@ public class Jogador {
         this.nome = nome;
     }
 
-    public ArrayList<Pedra> getPedras(){
+    public ListaEncadeada getPedras(){
         return pedras;
     }
     
     public void addPedra(Pedra pedra){
-        pedras.add(pedra);
+        pedras.adicionar(pedra);
     }
 
-    public void removePedra(int idx){
-        pedras.remove(idx);
+    public void removePedra(int idx) throws ListaVaziaException{
+        pedras.remover(idx);
     }
 
     public int getPontos(){

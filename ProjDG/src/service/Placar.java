@@ -11,15 +11,17 @@ public class Placar extends JInternalFrame {
     private Jogador jogador1;
     private Jogador jogador2;
     private JTextArea resultado;
+    private String mensagem;
 
     public Placar(Jogador jogador1, Jogador jogador2) {
         setJogador1(jogador1);
         setJogador2(jogador2);
-        setBounds(602, 0, 188, 400);
+        setBounds(702, 0, 200, 400);
         resultado = new JTextArea();
         this.getContentPane().add(resultado);
         atualizarPlacar();
         setTitle("Placar");
+        mensagem = "";
     }
 
     /*

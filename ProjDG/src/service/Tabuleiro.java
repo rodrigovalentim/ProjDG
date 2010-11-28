@@ -1,7 +1,6 @@
 package service;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -27,6 +26,8 @@ public class Tabuleiro extends JInternalFrame {
     private Color corCasaEscura;
     private ArrayList<Pedra> pedrasCapturadas;
     private int id;
+    private final String casaEscura = "casaescura.png";
+    private final String casaClara = "casaclara.png";
 
     public Tabuleiro() {
         /*
@@ -61,10 +62,14 @@ public class Tabuleiro extends JInternalFrame {
          * tera este valor, ou seja, nao sobrara espaco em branco para exibicao do background do IF
          *
          * Se configuradas com valores negativos, ai a borda aparecera
+         *
+         * Também são definidas e largura e coluna de cada componente da constraint
          */
 
         getTabuleiroGBConstraints().weightx = 1;
         getTabuleiroGBConstraints().weighty = 1;
+        getTabuleiroGBConstraints().gridwidth = 1;
+        getTabuleiroGBConstraints().gridheight = 1;
         /*
          * Casa escura - Marrom
          * Casa clara - Creme
@@ -81,18 +86,18 @@ public class Tabuleiro extends JInternalFrame {
             for (int coluna = 0; coluna < casas[0].length; coluna++) {
                 if (linha % 2 != 0) {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false);
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false, casaClara);
                         setId(getId() + 1);
                     } else {
-                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true);
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true, casaEscura);
                         setId(getId() + 1);
                     }
                 } else {
                     if (coluna % 2 != 0) {
-                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true);
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaEscura(), true, casaEscura);
                         setId(getId() + 1);
                     } else {
-                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false);
+                        casas[linha][coluna] = new Casa(getId(), getCorCasaClara(), false, casaClara);
                         setId(getId() + 1);
                     }
                 }
@@ -102,11 +107,11 @@ public class Tabuleiro extends JInternalFrame {
                  *
                  * Adiciona componente (casas -> extend javax.swing.JPanel) ao tabuleiro -> extend JInternalFrame
                  */
-                adicionaComponente(getCasas()[linha][coluna], linha, coluna, 1, 1);
+                adicionaComponente(getCasas()[linha][coluna], linha, coluna);
             }
         }
         setTitle("Tabuleiro"); //Titulo do Tabuleiro
-        setSize(600, 550); //Size do do tabuleiro
+        setSize(600, 520); //Size do do tabuleiro
     }
 
     /*
@@ -119,11 +124,9 @@ public class Tabuleiro extends JInternalFrame {
      * AdicionaComponente foi criado para incluir o componente casa no container tabuleiro
      */
 
-    private void adicionaComponente(Component comp, int linha, int coluna, int width, int height) {
+    private void adicionaComponente(Component comp, int linha, int coluna) {
         getTabuleiroGBConstraints().gridx = coluna;
         getTabuleiroGBConstraints().gridy = linha;
-        getTabuleiroGBConstraints().gridwidth = width;
-        getTabuleiroGBConstraints().gridheight = height;
         getTabuleiroGridBagLayout().setConstraints(comp, getTabuleiroGBConstraints());
         getTabuleiroContainer().add(comp);
     }
@@ -144,7 +147,7 @@ public class Tabuleiro extends JInternalFrame {
      * - Colocamos a variavel pedra, que contem o objeto dama na casa
      */
     public void promovePedra(int jogadorVez, int x, int y) {
-        Pedra pedra = new Dama(jogadorVez, getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor());
+        Pedra pedra = new Dama(jogadorVez, getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor(), "teste");
         getCasas()[x][y].retiraPedra();
         getCasas()[x][y].setPedra(pedra);
     }
