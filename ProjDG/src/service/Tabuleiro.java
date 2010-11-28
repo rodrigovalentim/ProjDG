@@ -106,7 +106,7 @@ public class Tabuleiro extends JInternalFrame {
             }
         }
         setTitle("Tabuleiro"); //Titulo do Tabuleiro
-        setSize(700, 670); //Size do do tabuleiro
+        setSize(600, 550); //Size do do tabuleiro
     }
 
     /*

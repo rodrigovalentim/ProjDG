@@ -8,17 +8,29 @@
 package control;
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
-import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import service.Jogador;
 import service.Peca;
 import service.Placar;
+import javax.swing.JOptionPane;
+import networkgamer.clientserv.Cliente;
+import networkgamer.clientserv.ServicoCliente;
+import networkgamer.clientserv.Servidor;
 import service.Tabuleiro;
 
 public class Jogo extends JFrame {
 
+    private Cliente cliente;
+    private Servidor servidor;
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
@@ -27,7 +39,7 @@ public class Jogo extends JFrame {
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
-//    private ArrayList<Pedra> pedrasCapturadas;
+    private ServicoCliente sCliente;
 
     public Jogo(Jogador jogador1, Jogador jogador2) {
         /*
@@ -37,6 +49,63 @@ public class Jogo extends JFrame {
         final JDesktopPane guiDamas = new JDesktopPane();
         getContentPane().add(guiDamas);
         setResizable(false); //impossibilitando o resize
+        /*
+         * Criando Menu
+         */
+        JMenuBar menu = new JMenuBar();
+        setJMenuBar(menu);
+        /*
+         * Criando Menu Jogo
+         */
+        JMenu menuJogo = new JMenu("Jogo");
+        menuJogo.setMnemonic('J');
+        /*
+         * Criando ItemMenu Sair
+         */
+        JMenuItem mItemSair = new JMenuItem("Sair");
+        mItemSair.setMnemonic('S');
+        mItemSair.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                System.exit(0);
+            }
+        });
+        menuJogo.add(mItemSair);
+
+        /*
+         * Criando Menu Rede
+         */
+        JMenu menuRede = new JMenu("Rede");
+        menuJogo.setMnemonic('R');
+        /*
+         * Criando ItemMenu Servidor
+         */
+        JMenuItem mItemCliente = new JMenuItem("Cliente");
+        mItemCliente.setMnemonic('C');
+        mItemCliente.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                inicializarCliente(guiDamas);
+            }
+        });
+        menuRede.add(mItemCliente);
+        /*
+         * Criando ItemMenu Servidor
+         */
+        JMenuItem mItemServidor = new JMenuItem("Servidor");
+        mItemServidor.setMnemonic('E');
+        mItemServidor.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                setServidor(new Servidor(8989));
+                getServidor().iniciaServidor();
+            }
+        });
+        menuRede.add(mItemServidor);
+
+        menu.add(menuJogo);
+        menu.add(menuRede);
         /*
          * Escutador do click do botao close para fechar o jogo.
          */
@@ -62,8 +131,7 @@ public class Jogo extends JFrame {
         distribuirPedras();
         posicionarPedras(getJogadores()[jogador1.getId()]);
         posicionarPedras(getJogadores()[jogador2.getId()]);
-        getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
-        getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
+
         /*
          * Inicializando Listener para ouvir o click do mouse
          */
@@ -73,6 +141,32 @@ public class Jogo extends JFrame {
                 capturaClicks(mouseEvent);
             }
         });
+    }
+
+    public void inicializarCliente(JDesktopPane desktopPane) {
+        String ip = null;
+        int porta = -1;
+
+        setCliente(new Cliente(sCliente));
+        try {
+            porta = Integer.parseInt(JOptionPane.showInputDialog(null, "Informe uma porta para conexao", "Porta do Servidor", JOptionPane.QUESTION_MESSAGE));
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Porta incorreta", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+        if (porta > 0) {
+            ip = JOptionPane.showInputDialog(null, "Informe o IP do Servidor", "Endereco do Servidor", JOptionPane.QUESTION_MESSAGE);
+            getTabuleiro().mostra(desktopPane); //Exibe o tabuleiro na tela principal
+            getPlacar().mostra(desktopPane); //Exibe o placar na tela principal
+        }
+        if (ip != null && porta > 0) {
+            try {
+                getCliente().iniciaCliente(ip, porta);
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void capturaClicks(MouseEvent e) {
@@ -289,6 +383,11 @@ public class Jogo extends JFrame {
         getTabuleiro().getCasas()[linhaCasaOrigem][ColunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
         if (((getJogadorDaVez() == 0) && (LinhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (LinhaCasaDestino == 0))) {
             setDama(LinhaCasaDestino, ColunaCasaDestino);
+        }
+        try {
+            getCliente().enviaMensagem("mover");
+        } catch (IOException ex) {
+            Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -681,5 +780,33 @@ public class Jogo extends JFrame {
         } else {
             setJogadorDaVez(1);
         }
+    }
+
+    /**
+     * @return the cliente
+     */
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    /**
+     * @param cliente the cliente to set
+     */
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    /**
+     * @return the servidor
+     */
+    public Servidor getServidor() {
+        return servidor;
+    }
+
+    /**
+     * @param servidor the servidor to set
+     */
+    public void setServidor(Servidor servidor) {
+        this.servidor = servidor;
     }
 }
