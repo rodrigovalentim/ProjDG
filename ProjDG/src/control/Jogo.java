@@ -203,8 +203,8 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getForeground());
-        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
+        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
         if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
             setDama(linhaCasaDestino, colunaCasaDestino);
         }
@@ -430,12 +430,12 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[getOldX()][getOldY()].getImagemAreaCasa());
-        //getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setForeground(getTabuleiro().getCasas()[getOldX()][getOldY()].getBackground());
+        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
+        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
         try {
             cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
                     + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
-                    + String.valueOf(getOldX()) + "," + String.valueOf(getOldY()));
+                    + String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem));
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
         }
@@ -466,7 +466,7 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
-        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
+        getTabuleiro().getCasas()[x][y].setImagem(getTabuleiro().getCasas()[x][y].getImagemAreaCasa());
         getPlacar().atualizarPlacar();
         getPlacar().verificaVencedor(this);
         try {

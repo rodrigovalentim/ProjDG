@@ -20,9 +20,8 @@ public class Damas {
      * Startando processo
      */
     public static void main(String[] args) {
-//        SplashWindow telaSplash = new SplashWindow("../img/tabuleirosempeca.png");
-//new ImageLoader().imageLoader("imagem/tabuleirosempeca.png");
-//        telaSplash.open(1000);
+//      SplashWindow telaSplash = new SplashWindow("../img/tabuleirosempeca.png");
+//      telaSplash.open(1000);
         System.out.println("Iniciando Damas");
         jogador1 = new Jogador("Player 1", 0, 0);
         jogador2 = new Jogador("Player 2", 1, 40);

@@ -75,12 +75,11 @@ public class Casa extends javax.swing.JPanel {
          * Atualiza cor da pedra
          */
         if (getPedra() != null) {
-        //    setForeground(getPedra().getCor());
-
+            //    setForeground(getPedra().getCor());
         }
 
         if (getPedra() != null && getPedra().identificaPedra().equals("dama")) {
-           // layoutCasa.setColor(getBackground());
+            // layoutCasa.setColor(getBackground());
             /*
              * Calculo exato para pintar o centro das pedras de acordo com a cor do jogador
              */
@@ -98,12 +97,12 @@ public class Casa extends javax.swing.JPanel {
 
     public void setPedra(Pedra pedra) {
         this.pedra = pedra;
-        this.setImagem(pedra.getImagem());
+        if (pedra != null) {
+            setImagem(pedra.getImagem());
+        }
     }
 
     public void retiraPedra() {
-        this.setImagem(getImagemAreaCasa());
-        this.repaint();
         this.setPedra(null);
     }
 

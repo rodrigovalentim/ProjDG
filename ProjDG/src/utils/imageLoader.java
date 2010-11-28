@@ -3,8 +3,6 @@ package utils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -14,6 +12,11 @@ import javax.imageio.ImageIO;
 public class ImageLoader {
 
     public BufferedImage imageLoader(String imgString) {
+        /*
+        O uso de thread se da deivo a rotina não saber qual qual thread estará rodando este código
+        então se o classloader que carregou esta classe for diferente do classeloader que está rodando a thread
+        ele não vai encontrar a imagem mesmo ela estando lá
+        */
         ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
         BufferedImage imagem = null;
