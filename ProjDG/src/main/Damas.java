@@ -5,6 +5,7 @@ import gui.SplashWindow;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import service.Jogador;
+import utils.ImageLoader;
 
 /**
  *
@@ -20,7 +21,7 @@ public class Damas {
      */
     public static void main(String[] args) {
 //        SplashWindow telaSplash = new SplashWindow("../img/tabuleirosempeca.png");
-
+//new ImageLoader().imageLoader("imagem/tabuleirosempeca.png");
 //        telaSplash.open(1000);
         System.out.println("Iniciando Damas");
         jogador1 = new Jogador("Player 1", 0, 0);

@@ -30,7 +30,7 @@ import service.Jogador;
 import service.Peca;
 import service.Placar;
 import service.Tabuleiro;
-import utils.imageLoader;
+import utils.ImageLoader;
 
 public class Jogo extends JFrame implements ServicoCliente {
 
@@ -44,8 +44,9 @@ public class Jogo extends JFrame implements ServicoCliente {
     private int oldY;
     private Cliente cliente;
     private static BufferedImage imagem;
-    private final String pecaClara = "pecaclara.png";
-    private final String pecaEscura = "pecaescura.png";
+    private final String pecaClara = "imagem/pecaclara.png";
+    private final String pecaEscura = "imagem/pecaescura.png";
+    private final String fundo = "imagem/img.png";
 
     public Jogo(final Jogador jogador1, final Jogador jogador2) {
 
@@ -53,8 +54,7 @@ public class Jogo extends JFrame implements ServicoCliente {
          * Colocando titulo na tela principal
          */
         super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
-        URL caminho = getClass().getClassLoader().getResource("img");
-        imagem = new imageLoader().imageLoader("img.png");
+        imagem = new ImageLoader().imageLoader(fundo);
         final JDesktopPane guiDamas = new JDesktopPane() {
 
             public void paintComponent(Graphics g) {

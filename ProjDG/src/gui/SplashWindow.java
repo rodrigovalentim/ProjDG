@@ -17,7 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
-import utils.imageLoader;
+import utils.ImageLoader;
 import utils.toImage;
 import utils.toImageIcon;
 
@@ -38,7 +38,7 @@ public class SplashWindow extends JWindow implements WindowListener
      * @param splash    String com o endereco da imagem exibida na tela de splash.
      */
     public SplashWindow(String img) {
-        imagem = new JLabel(new toImageIcon().toImageIcon(new imageLoader().imageLoader(img)));
+        imagem = new JLabel(new toImageIcon().toImageIcon(new ImageLoader().imageLoader(img)));
         imagem.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
     }
 

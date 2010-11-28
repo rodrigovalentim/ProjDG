@@ -1,31 +1,33 @@
 package utils;
 
-import control.Jogo;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import service.Casa;
 
 /**
  *
  * @author Rodrigo
  */
-public class imageLoader {
-
-    private BufferedImage imagem;
+public class ImageLoader {
 
     public BufferedImage imageLoader(String imgString) {
-        try {
-            System.out.println(getClass().getResource("/imagem/img.png").toString());
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-            File img = new File(getClass().getResource("/imagem/img.png").toString());
-            imagem = ImageIO.read(img);
+        BufferedImage imagem = null;
+        try {
+            URL imgUrl = ccl.getResource(imgString);
+            if (imgUrl == null) {
+                throw new IllegalArgumentException("imgString='" + imgString + "' is not a valid image!");
+            }
+
+            imagem = ImageIO.read(imgUrl);
         } catch (IOException ex) {
-            Logger.getLogger(Casa.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
+
         return imagem;
     }
 }

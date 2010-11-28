@@ -6,7 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import model.Pedra;
-import utils.imageLoader;
+import utils.ImageLoader;
 
 public class Casa extends javax.swing.JPanel {
 
@@ -29,8 +29,8 @@ public class Casa extends javax.swing.JPanel {
         setCasaPossivel(possivel);
         this.setBackground(cor);
         this.setForeground(cor);
-        imagem = new imageLoader().imageLoader(imgString);
-        setImagemAreaCasa(new imageLoader().imageLoader(imgString));
+        imagem = new ImageLoader().imageLoader(imgString);
+        setImagemAreaCasa(new ImageLoader().imageLoader(imgString));
     }
 
     public void paintComponent(Graphics graphics) {

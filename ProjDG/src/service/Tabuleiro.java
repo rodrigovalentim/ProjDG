@@ -26,8 +26,8 @@ public class Tabuleiro extends JInternalFrame {
     private Color corCasaEscura;
     private ArrayList<Pedra> pedrasCapturadas;
     private int id;
-    private final String casaEscura = "casaescura.png";
-    private final String casaClara = "casaclara.png";
+    private final String casaEscura = "imagem/casaescura.png";
+    private final String casaClara = "imagem/casaclara.png";
 
     public Tabuleiro() {
         /*

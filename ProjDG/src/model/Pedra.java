@@ -2,7 +2,7 @@ package model;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import utils.imageLoader;
+import utils.ImageLoader;
 
 public abstract class Pedra {
 
@@ -14,7 +14,7 @@ public abstract class Pedra {
     public Pedra(int idowner, int idPedra, Color cor, String imgString) {
         setIdOwner(idowner);
         setIdPedra(idPedra);
-        setImagem(new imageLoader().imageLoader(imgString));
+        setImagem(new ImageLoader().imageLoader(imgString));
     }
 
     public int getIdOwner() {
