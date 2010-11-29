@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -46,7 +45,7 @@ public class Jogo extends JFrame implements ServicoCliente {
     private static BufferedImage imagem;
     private final String pecaClara = "imagem/pecaclara.png";
     private final String pecaEscura = "imagem/pecaescura.png";
-    private final String fundo = "imagem/img.png";
+    private final String fundo = "imagem/backgroundFloor.png";
 
     public Jogo(final Jogador jogador1, final Jogador jogador2) {
 
@@ -57,6 +56,7 @@ public class Jogo extends JFrame implements ServicoCliente {
         imagem = new ImageLoader().imageLoader(fundo);
         final JDesktopPane guiDamas = new JDesktopPane() {
 
+            @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (imagem != null) {
@@ -73,6 +73,7 @@ public class Jogo extends JFrame implements ServicoCliente {
          */
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 dispose();
                 System.exit(0);
@@ -169,6 +170,7 @@ public class Jogo extends JFrame implements ServicoCliente {
              */
             getTabuleiro().addMouseListener(new MouseAdapter() {
 
+                @Override
                 public void mouseReleased(MouseEvent mouseEvent) {
                     capturaClicks(mouseEvent);
                 }
@@ -203,8 +205,8 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
-        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
+//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
+//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
         if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
             setDama(linhaCasaDestino, colunaCasaDestino);
         }
@@ -430,8 +432,8 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
-        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
+//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
+//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
         try {
             cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
                     + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
@@ -466,7 +468,7 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
-        getTabuleiro().getCasas()[x][y].setImagem(getTabuleiro().getCasas()[x][y].getImagemAreaCasa());
+//        getTabuleiro().getCasas()[x][y].setImagem(getTabuleiro().getCasas()[x][y].getImagemAreaCasa());
         getPlacar().atualizarPlacar();
         getPlacar().verificaVencedor(this);
         try {

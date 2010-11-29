@@ -1,10 +1,12 @@
 package model;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import utils.ImageLoader;
 
-public abstract class Pedra {
+public abstract class Pedra extends javax.swing.JPanel {
 
     private int idOwner;
     private int idPedra;
@@ -15,6 +17,17 @@ public abstract class Pedra {
         setIdOwner(idowner);
         setIdPedra(idPedra);
         setImagem(new ImageLoader().imageLoader(imgString));
+        this.setSize(150, 150);
+    }
+    @Override
+    public void paintComponent(Graphics graphics) {
+        /*
+         * super.paintComponent(g);  - chamando construtor do JPanel, swing lhe ajuda a desenhar a tela
+         */
+        super.paintComponent(graphics);
+        Graphics2D graphics2D = (Graphics2D) graphics.create();
+        graphics2D.drawImage(getImagem(), 0, 0, 76, 68, this);
+        this.setSize(150, 150);
     }
 
     public int getIdOwner() {
@@ -61,6 +74,7 @@ public abstract class Pedra {
      */
     public void setImagem(BufferedImage imagem) {
         this.imagem = imagem;
+        repaint();
     }
     /**
      * @param posicao the posicao to set
