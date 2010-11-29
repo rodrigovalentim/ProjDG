@@ -70,16 +70,6 @@ public class Casa extends javax.swing.JPanel {
             layoutCasa.drawRect(0, 0, super.getWidth() - 1, super.getHeight() - 1);
             layoutCasa.drawRect(1, 1, super.getWidth() - 3, super.getHeight() - 3);
         }
-
-        /*
-         * Atualiza cor da pedra
-         */
-        if (getPedra() != null && getPedra().identificaPedra().equals("dama")) {
-            /*
-             * Calculo exato para pintar o centro das pedras de acordo com a cor do jogador
-             */
-            graphics.fillOval(super.getWidth() / 4, super.getHeight() / 4, super.getWidth() / 2, super.getHeight() / 2);
-        }
     }
 
     public int getId() {
@@ -94,12 +84,16 @@ public class Casa extends javax.swing.JPanel {
         this.pedra = pedra;
         if (pedra != null) {
             this.add(pedra);
+            repaint();
+            updateUI();
         }
         repaint();
     }
 
     public void retiraPedra() {
+        this.remove(getPedra());
         this.setPedra(null);
+        repaint();
     }
 
     /**
