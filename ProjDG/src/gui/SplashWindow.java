@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 import utils.ImageLoader;
-import utils.toImage;
 import utils.toImageIcon;
 
 /**

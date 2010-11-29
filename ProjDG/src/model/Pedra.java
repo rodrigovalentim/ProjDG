@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -17,8 +18,8 @@ public abstract class Pedra extends javax.swing.JPanel {
         setIdOwner(idowner);
         setIdPedra(idPedra);
         setImagem(new ImageLoader().imageLoader(imgString));
-        this.setSize(150, 150);
     }
+
     @Override
     public void paintComponent(Graphics graphics) {
         /*
@@ -26,8 +27,17 @@ public abstract class Pedra extends javax.swing.JPanel {
          */
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics.create();
-        graphics2D.drawImage(getImagem(), 0, 0, 76, 68, this);
-        this.setSize(150, 150);
+        graphics2D.drawImage(getImagem(), 0, 0, this);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(getImagem().getWidth(), getImagem().getHeight());
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
     }
 
     public int getIdOwner() {

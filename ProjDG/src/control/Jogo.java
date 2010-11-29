@@ -148,11 +148,8 @@ public class Jogo extends JFrame implements ServicoCliente {
         this.setOldY(-1);
         setJogadorDaVez(0); //Jogador da Vez - Inicia com o jogador 0
         jogadores = new Jogador[2];
-
         setJogadores(jogador1.getId(), jogador1);
-
         setJogadores(jogador2.getId(), jogador2);
-
     }
 
     public void iniciaCliente(JDesktopPane guiDamas, Jogador jogador1, Jogador jogador2, String ip) {
@@ -205,8 +202,6 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
-//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
         if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
             setDama(linhaCasaDestino, colunaCasaDestino);
         }
