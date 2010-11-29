@@ -29,7 +29,7 @@ import service.Jogador;
 import service.Peca;
 import service.Placar;
 import service.Tabuleiro;
-import utils.ImageLoader;
+import utils.ImagemLoad;
 
 public class Jogo extends JFrame implements ServicoCliente {
 
@@ -43,8 +43,8 @@ public class Jogo extends JFrame implements ServicoCliente {
     private int oldY;
     private Cliente cliente;
     private static BufferedImage imagem;
-    private final String pecaClara = "imagem/pecaclara.png";
-    private final String pecaEscura = "imagem/pecaescura.png";
+    private final String pecaClara = "imagem/pedraclara.png";
+    private final String pecaEscura = "imagem/pedraescura.png";
     private final String fundo = "imagem/backgroundFloor.png";
 
     public Jogo(final Jogador jogador1, final Jogador jogador2) {
@@ -53,7 +53,7 @@ public class Jogo extends JFrame implements ServicoCliente {
          * Colocando titulo na tela principal
          */
         super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
-        imagem = new ImageLoader().imageLoader(fundo);
+        imagem = new ImagemLoad().imageLoader(fundo);
         final JDesktopPane guiDamas = new JDesktopPane() {
 
             @Override
@@ -134,8 +134,8 @@ public class Jogo extends JFrame implements ServicoCliente {
 
                     public void actionPerformed(ActionEvent e) {
                         String ip = JOptionPane.showInputDialog(null,
-                                "Informe o IP do Servidor",
-                                "Endere?o do Servidor",
+                                "Informe o IP/HOST do Servidor",
+                                "Endereco do Servidor",
                                 JOptionPane.QUESTION_MESSAGE);
                         iniciaCliente(guiDamas, jogador1, jogador2, ip);
                     }
@@ -154,34 +154,40 @@ public class Jogo extends JFrame implements ServicoCliente {
 
     public void iniciaCliente(JDesktopPane guiDamas, Jogador jogador1, Jogador jogador2, String ip) {
         if (!ip.equals("")) {
-            cliente = new Cliente(this);
-            tabuleiro = new Tabuleiro();
-            placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
-            distribuirPedras();
-            posicionarPedras(getJogadores()[jogador1.getId()]);
-            posicionarPedras(getJogadores()[jogador2.getId()]);
-            getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
-            getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
-                /*
-             * Inicializando Listener para ouvir o click do mouse
-             */
-            getTabuleiro().addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseReleased(MouseEvent mouseEvent) {
-                    capturaClicks(mouseEvent);
-                }
-            });
             try {
+                cliente = new Cliente(this);
                 cliente.iniciaCliente(ip, 1235);
+                tabuleiro = new Tabuleiro();
+                placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
+                distribuirPedras();
+                posicionarPedras(getJogadores()[jogador1.getId()]);
+                posicionarPedras(getJogadores()[jogador2.getId()]);
+                getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
+                getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
+                /*
+                 * Inicializando Listener para ouvir o click do mouse
+                 */
+                getTabuleiro().addMouseListener(new MouseAdapter() {
+
+                    @Override
+                    public void mouseReleased(MouseEvent mouseEvent) {
+                        capturaClicks(mouseEvent);
+                    }
+                });
             } catch (UnknownHostException ex) {
-                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showInputDialog(null,
+                        "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                        "Erro!",
+                        JOptionPane.ERROR_MESSAGE);
             } catch (IOException ex) {
-                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showInputDialog(null,
+                        "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                        "Erro!",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showInputDialog(null,
-                    "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                    "Impossível iniciar jogo, IP/HOST em branco",
                     "Erro!",
                     JOptionPane.ERROR_MESSAGE);
         }

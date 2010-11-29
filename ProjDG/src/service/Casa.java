@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import model.Pedra;
-import utils.ImageLoader;
+import utils.ImagemLoad;
 
 public class Casa extends javax.swing.JPanel {
 
@@ -27,14 +27,13 @@ public class Casa extends javax.swing.JPanel {
         setLayoutCasa(null);
         setMovimentoPossivel(false, null);
         setCasaPossivel(possivel);
-        imagem = new ImageLoader().imageLoader(imgString);
-        this.setSize(100, 100);
+        imagem = new ImagemLoad().imageLoader(imgString);
     }
 
     @Override
     public void paintComponent(Graphics graphics) {
         layoutCasa = graphics;
-        setLayout(new GridLayout(2,2));
+        setLayout(new GridLayout(1, 1));
         /*
          * super.paintComponent(g);  - chamando construtor do JPanel, swing lhe ajuda a desenhar a tela
          */
@@ -90,12 +89,13 @@ public class Casa extends javax.swing.JPanel {
     public void setId(int id) {
         this.id = id;
     }
+
     public void setPedra(Pedra pedra) {
         this.pedra = pedra;
         if (pedra != null) {
             this.add(pedra);
-            repaint();
         }
+        repaint();
     }
 
     public void retiraPedra() {
@@ -164,7 +164,7 @@ public class Casa extends javax.swing.JPanel {
      */
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(50, 50);
+        return new Dimension(100, 100);
     }
 
     @Override
@@ -230,5 +230,4 @@ public class Casa extends javax.swing.JPanel {
         this.imagem = imagem;
         this.repaint();
     }
-
 }

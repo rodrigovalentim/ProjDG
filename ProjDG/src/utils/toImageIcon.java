@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
  *
  * @author Rodrigo
  */
-public class toImageIcon {
+public class ToImageIcon {
 
     public ImageIcon toImageIcon(BufferedImage img) {
         ImageIcon icon = new ImageIcon(img.getScaledInstance(img.getWidth(), img.getHeight(), 10000));

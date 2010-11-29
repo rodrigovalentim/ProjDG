@@ -1,11 +1,9 @@
 package main;
 
 import control.Jogo;
-import gui.SplashWindow;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import service.Jogador;
-import utils.ImageLoader;
 
 /**
  *
