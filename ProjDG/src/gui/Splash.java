@@ -22,14 +22,10 @@ public class Splash {
         // do something here to simulate the program doing something that
         // is time consuming
         for (int i = 0; i <= 100; i++) {
-<<<<<<< HEAD
             for (long j = 0; j < 300000; ++j) {
-=======
-            for (long j = 0; j < 500000; ++j) {
->>>>>>> 13ef2c4e826eba958efffe35327c5ee083e83d58
                 String poop = " " + (j + i);
             }
-            screen.setProgress("Carregando " + i+"%", i);  // mensagem do progressbar
+            screen.setProgress("Carregando " + i + "%", i);  // mensagem do progressbar
         }
         splashScreenDestruct();
     }
@@ -45,6 +41,4 @@ public class Splash {
         screen.setProgressMax(100);
         screen.setScreenVisible(true);
     }
-
-
 }
