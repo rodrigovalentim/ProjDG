@@ -1,11 +1,9 @@
 package model;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import utils.ImageLoader;
 
 public abstract class Pedra extends javax.swing.JPanel {
 
@@ -14,10 +12,10 @@ public abstract class Pedra extends javax.swing.JPanel {
     private Color cor;
     private BufferedImage imagem;
 
-    public Pedra(int idowner, int idPedra, Color cor, String imgString) {
+    public Pedra(int idowner, int idPedra, Color cor) {
         setIdOwner(idowner);
         setIdPedra(idPedra);
-        setImagem(new ImageLoader().imageLoader(imgString));
+        insereImagem();
     }
 
     @Override
@@ -27,17 +25,7 @@ public abstract class Pedra extends javax.swing.JPanel {
          */
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics.create();
-        graphics2D.drawImage(getImagem(), 0, 0, this);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(getImagem().getWidth(), getImagem().getHeight());
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
+        graphics2D.drawImage(getImagem(), 0, 0, this.getWidth() + 1, this.getHeight(), this);
     }
 
     public int getIdOwner() {
@@ -57,6 +45,8 @@ public abstract class Pedra extends javax.swing.JPanel {
     }
 
     public abstract String identificaPedra();
+
+    public abstract void insereImagem();
 
     /**
      * @return the idPedra
@@ -86,7 +76,4 @@ public abstract class Pedra extends javax.swing.JPanel {
         this.imagem = imagem;
         repaint();
     }
-    /**
-     * @param posicao the posicao to set
-     */
 }

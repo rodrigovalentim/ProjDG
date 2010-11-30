@@ -148,7 +148,7 @@ public class Tabuleiro extends JInternalFrame {
      * - Colocamos a variavel pedra, que contem o objeto dama na casa
      */
     public void promovePedra(int jogadorVez, int x, int y) {
-        Pedra pedra = new Dama(jogadorVez, getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor(), "teste");
+        Pedra pedra = new Dama(jogadorVez, getCasas()[x][y].getPedra().getIdPedra(), getCasas()[x][y].getPedra().getCor());
         getCasas()[x][y].retiraPedra();
         getCasas()[x][y].setPedra(pedra);
     }

@@ -9,12 +9,21 @@
 <!-- in the project's Project Properties dialog box.-->
 <project name="ProjDG" default="default" basedir=".">
     <description>Builds, tests, and runs the project ProjDG.</description>
+    <!-- name of the output .jar file -->
+    <property name="jar.name" value="ProjDG.jar" />
+    <!-- base directory for distribution target -->
+    <property name="dist.home" value="dist" />
+    <!-- base directory for compilation targets -->
+    <property name="build.home" value="build" />
+    <!-- The base directory for all libraries (jar) files -->
+    <property name="lib.home" value="lib" />
+
     <import file="nbproject/build-impl.xml"/>
     <!--
 
-    There exist several targets which are by default empty and which can be 
-    used for execution of your tasks. These targets are usually executed 
-    before and after some main targets. They are: 
+    There exist several targets which are by default empty and which can be
+    used for execution of your tasks. These targets are usually executed
+    before and after some main targets. They are:
 
       -pre-init:                 called before initialization of project properties
       -post-init:                called after initialization of project properties
@@ -40,12 +49,12 @@
             </obfuscate>
         </target>
 
-    For list of available properties check the imported 
-    nbproject/build-impl.xml file. 
+    For list of available properties check the imported
+    nbproject/build-impl.xml file.
 
 
     Another way to customize the build is by overriding existing main targets.
-    The targets of interest are: 
+    The targets of interest are:
 
       -init-macrodef-javac:     defines macro for javac compilation
       -init-macrodef-junit:     defines macro for junit execution
@@ -53,7 +62,7 @@
       -init-macrodef-java:      defines macro for class execution
       -do-jar-with-manifest:    JAR building (if you are using a manifest)
       -do-jar-without-manifest: JAR building (if you are not using a manifest)
-      run:                      execution of project 
+      run:                      execution of project
       -javadoc-build:           Javadoc generation
       test-report:              JUnit report generation
 
@@ -65,10 +74,60 @@
             </exec>
         </target>
 
-    Notice that the overridden target depends on the jar target and not only on 
-    the compile target as the regular run target does. Again, for a list of available 
+    Notice that the overridden target depends on the jar target and not only on
+    the compile target as the regular run target does. Again, for a list of available
     properties which you can use, check the target you are overriding in the
-    nbproject/build-impl.xml file. 
+    nbproject/build-impl.xml file.
 
     -->
+    <target name="jar" depends="compile" description="Create jar and MANIFEST.MF">
+        <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+        <pathconvert property="libs.project" pathsep=" ">
+            <mapper>
+                <chainedmapper>
+                    <!-- remove absolute path -->
+                    <flattenmapper />
+                    <!-- add lib/ prefix -->
+                    <globmapper from="*" to="lib/*" />
+                </chainedmapper>
+            </mapper>
+            <path>
+                <!-- lib.home contains all jar files, in several subdirectories -->
+                <fileset dir="${lib.home}">
+                    <include name="**/*.jar" />
+                </fileset>
+            </path>
+        </pathconvert>
+        <!-- create the jar -->
+        <jar jarfile="${build.home}/${jar.name}" basedir="${build.home}/classes">
+            <!-- define MANIFEST.MF -->
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="${main.class}" />
+                <!-- finally, use the magically generated libs path -->
+                <attribute name="Class-Path" value="${libs.project}" />
+                </manifest>
+                </jar>
+    <delete dir="${dist.home}" />
+    <!-- contains all library dependencies -->
+    <mkdir dir="${dist.home}/lib" />
+    <copy todir="${dist.home}" file="${build.home}/${jar.name}" />
+    <copy todir="${dist.home}/lib" filtering="off">
+        <!-- remove the directory hierarchy: lib contains no subdirectories -->
+        <flattenmapper />
+        <fileset dir="${lib.home}" includes="**/*.jar" />
+
+        </copy>
+                </target>
+<target name="dist" depends="jar" description="Create binary distribution">
+    <delete dir="${dist.home}" />
+    <!-- contains all library dependencies -->
+    <mkdir dir="${dist.home}/lib" />
+    <copy todir="${dist.home}" file="${build.home}/${jar.name}" />
+    <copy todir="${dist.home}/lib" filtering="off">
+        <!-- remove the directory hierarchy: lib contains no subdirectories -->
+        <flattenmapper />
+        <fileset dir="${lib.home}" includes="**/*.jar" />
+        </copy>
+        </target>
 </project>

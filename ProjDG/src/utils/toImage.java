@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Rodrigo
  */
-public class toImage {
+public class ToImage {
 
     public static Image toImage(BufferedImage bufferedImage) {
         return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());

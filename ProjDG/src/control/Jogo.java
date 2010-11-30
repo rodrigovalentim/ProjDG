@@ -12,8 +12,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -29,7 +27,7 @@ import service.Jogador;
 import service.Peca;
 import service.Placar;
 import service.Tabuleiro;
-import utils.ImageLoader;
+import utils.ImagemLoad;
 
 public class Jogo extends JFrame implements ServicoCliente {
 
@@ -43,17 +41,14 @@ public class Jogo extends JFrame implements ServicoCliente {
     private int oldY;
     private Cliente cliente;
     private static BufferedImage imagem;
-    private final String pecaClara = "imagem/pecaclara.png";
-    private final String pecaEscura = "imagem/pecaescura.png";
     private final String fundo = "imagem/backgroundFloor.png";
 
     public Jogo(final Jogador jogador1, final Jogador jogador2) {
-
         /*
          * Colocando titulo na tela principal
          */
         super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
-        imagem = new ImageLoader().imageLoader(fundo);
+        imagem = new ImagemLoad().imageLoader(fundo);
         final JDesktopPane guiDamas = new JDesktopPane() {
 
             @Override
@@ -134,8 +129,8 @@ public class Jogo extends JFrame implements ServicoCliente {
 
                     public void actionPerformed(ActionEvent e) {
                         String ip = JOptionPane.showInputDialog(null,
-                                "Informe o IP do Servidor",
-                                "Endere?o do Servidor",
+                                "Informe o IP/HOST do Servidor",
+                                "Endereco do Servidor",
                                 JOptionPane.QUESTION_MESSAGE);
                         iniciaCliente(guiDamas, jogador1, jogador2, ip);
                     }
@@ -154,34 +149,40 @@ public class Jogo extends JFrame implements ServicoCliente {
 
     public void iniciaCliente(JDesktopPane guiDamas, Jogador jogador1, Jogador jogador2, String ip) {
         if (!ip.equals("")) {
-            cliente = new Cliente(this);
-            tabuleiro = new Tabuleiro();
-            placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
-            distribuirPedras();
-            posicionarPedras(getJogadores()[jogador1.getId()]);
-            posicionarPedras(getJogadores()[jogador2.getId()]);
-            getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
-            getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
-                /*
-             * Inicializando Listener para ouvir o click do mouse
-             */
-            getTabuleiro().addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseReleased(MouseEvent mouseEvent) {
-                    capturaClicks(mouseEvent);
-                }
-            });
             try {
+                cliente = new Cliente(this);
                 cliente.iniciaCliente(ip, 1235);
+                tabuleiro = new Tabuleiro();
+                placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
+                distribuirPedras();
+                posicionarPedras(getJogadores()[jogador1.getId()]);
+                posicionarPedras(getJogadores()[jogador2.getId()]);
+                getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
+                getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
+                /*
+                 * Inicializando Listener para ouvir o click do mouse
+                 */
+                getTabuleiro().addMouseListener(new MouseAdapter() {
+
+                    @Override
+                    public void mouseReleased(MouseEvent mouseEvent) {
+                        capturaClicks(mouseEvent);
+                    }
+                });
             } catch (UnknownHostException ex) {
-                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showInputDialog(null,
+                        "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                        "Erro!",
+                        JOptionPane.ERROR_MESSAGE);
             } catch (IOException ex) {
-                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showInputDialog(null,
+                        "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                        "Erro!",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showInputDialog(null,
-                    "Impossível iniciar jogo, IP (" + ip + ") incorreto",
+                    "Impossível iniciar jogo, IP/HOST em branco",
                     "Erro!",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -189,33 +190,10 @@ public class Jogo extends JFrame implements ServicoCliente {
 
     public void capturaMensagem(String mensagem) {
         String[] dados = mensagem.split(",");
-        if (dados.length > 2) {
-            setOldX(Integer.parseInt(dados[4]));
-            setOldY(Integer.parseInt(dados[5]));
-            servidorMove(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3]));
-            mudarJogadorVez();
-        } else {
-            servidorRetiraPeca(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
-        }
+        movimentoServidor(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
     }
 
-    private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
-        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
-        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
-            setDama(linhaCasaDestino, colunaCasaDestino);
-        }
-    }
-
-    private void servidorRetiraPeca(int x, int y) {
-        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
-        getTabuleiro().getCasas()[x][y].retiraPedra();
-        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
-        getPlacar().atualizarPlacar();
-        getPlacar().verificaVencedor(this);
-    }
-
-    public void capturaClicks(MouseEvent e) {
+    private void executaJogada(int getX, int getY) {
         /*
          * Evento que dispara quando o botao do mouse e solto.
          *
@@ -237,8 +215,8 @@ public class Jogo extends JFrame implements ServicoCliente {
          * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
          *
          */
-        int y = (e.getX()) / (getTabuleiro().getWidth() / 8);
-        int x = (e.getY() - valAjusteClick) / (getTabuleiro().getHeight() / 8);
+        int y = (getX) / (getTabuleiro().getWidth() / 8);
+        int x = (getY - valAjusteClick) / (getTabuleiro().getHeight() / 8);
 
         /*
          * Variavel abaixo usada para configurar a reanalise dos movimentos
@@ -333,6 +311,7 @@ public class Jogo extends JFrame implements ServicoCliente {
          * limpa Movimentos selecionados
          */
         hideMovimentosPossiveis();
+
         if (getTabuleiro().getCasas()[x][y].isCasaPossivel()
                 && getTabuleiro().getCasas()[x][y].getPedra() != null
                 && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
@@ -345,17 +324,187 @@ public class Jogo extends JFrame implements ServicoCliente {
             analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
         }
     }
+
+    private void movimentoServidor(int getX, int getY) {
+        executaJogada(getX, getY);
+    }
+
+    public void capturaClicks(MouseEvent e) {
+        executaJogada(e.getX(), e.getY());
+        try {
+            cliente.enviaMensagem(String.valueOf(e.getX()) + "," + String.valueOf(e.getY()));
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
+        }
+    }
+//    public void capturaMensagem(String mensagem) {
+//        String[] dados = mensagem.split(",");
+//        if (dados.length > 2) {
+//            setOldX(Integer.parseInt(dados[4]));
+//            setOldY(Integer.parseInt(dados[5]));
+//            servidorMove(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3]));
+//            mudarJogadorVez();
+//        } else {
+//            servidorRetiraPeca(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
+//        }
+//    }
+
+//    private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
+//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
+//        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
+//            setDama(linhaCasaDestino, colunaCasaDestino);
+//        }
+//    }
+//
+//    private void servidorRetiraPeca(int x, int y) {
+//        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
+//        getTabuleiro().getCasas()[x][y].retiraPedra();
+//        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
+//        getPlacar().atualizarPlacar();
+//        getPlacar().verificaVencedor(this);
+//    }
+//
+//    public void capturaClicks(MouseEvent e) {
+//        /*
+//         * Evento que dispara quando o botao do mouse e solto.
+//         *
+//         * super.getWidth serve para pegar a largura do componente
+//         *
+//         * super.getHeight serve para pegar a altura do componente
+//         *
+//         * A divisao por 8 e necessaria por que temos 8 casas
+//         *
+//         * Y esta recebendo testaMovimentos e X esta recebendo Y por que o mouseEvent interte isso, pra nos ajudar, claro.
+//         * Atraves destes testes, leitura de documentacoes
+//         * http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/MouseEvent.html
+//         * indentificamos que o MouseEvent retorna X como sendo linha e o Y como sendo coluna.
+//         * Invertendo as posicoes, tudo se resolveu.
+//         *
+//         *
+//         * O valor de ajuste igual a 20, quando subtraido da linha, temos uma maior precisao
+//         * no calculo nos possibilitando clicar bem proximo da borda da casa sem que ele pegue
+//         * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
+//         *
+//         */
+//        int y = (e.getX()) / (getTabuleiro().getWidth() / 8);
+//        int x = (e.getY() - valAjusteClick) / (getTabuleiro().getHeight() / 8);
+//
+//        /*
+//         * Variavel abaixo usada para configurar a reanalise dos movimentos
+//         */
+//        boolean reAnaliseMovimento = false;
+//        /*
+//         * Metodo set da rotina que configura novaJogada
+//         */
+//        setNovaJogada(false);
+//        /*
+//         * Rotina abaixo remover que foram "comidas" pelo adversario
+//         */
+//        if (getTabuleiro().getCasas()[x][y].isMovimentoPossivel()) {
+//            /*
+//             * Calculo usado para saber se o movimento realizado foi de mais de uma casa
+//             * Caso posivito, entra na rotina de analise de possiveis pecas comidas
+//             */
+//            if (Math.abs(getOldY() - y) >= 2) {
+//                int l = getOldX(), c = getOldY();
+//                if (x > l && y > c) {
+//                    while (getTabuleiro().getCasas()[l++][c++].isCasaPossivel()
+//                            && l < x
+//                            && c < y) {
+//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            retiraPeca(l, c);
+//                        }
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x > l && y < c) {
+//                    while (getTabuleiro().getCasas()[l++][c--].isCasaPossivel()
+//                            && l < x
+//                            && c > y) {
+//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            retiraPeca(l, c);
+//                        }
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x < l && y > c) {
+//                    while (getTabuleiro().getCasas()[l--][c++].isCasaPossivel()
+//                            && l > x
+//                            && c < y) {
+//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            retiraPeca(l, c);
+//                        }
+//                    }
+//                }
+//                l = getOldX();
+//                c = getOldY();
+//                if (x < l && y < c) {
+//                    while (getTabuleiro().getCasas()[l--][c--].isCasaPossivel()
+//                            && l > x
+//                            && c > y) {
+//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            retiraPeca(l, c);
+//                        }
+//                    }
+//                }
+//                /*
+//                 * Rotina de movimentacao da peca, da origem pro destino
+//                 */
+//                move(getOldX(), getOldY(), x, y);
+//                setOldX(x);
+//                setOldY(y);
+//                reAnaliseMovimento = true;
+//                /*
+//                 * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
+//                 */
+//                analistaTipoMovimento(x, y, reAnaliseMovimento);
+//            } else {
+//                /*
+//                 * Simples rotina de movimento, sem acao de comer
+//                 */
+//                move(getOldX(), getOldY(), x, y);
+//            }
+//            /*
+//             * Controla vez do jgoador
+//             */
+//            if (!isNovaJogada()) {
+//                mudarJogadorVez();
+//                reAnaliseMovimento = false;
+//            }
+//        }
+//        /*
+//         * Limpa casas selecionads
+//         */
+//        hideCasaSelecionada();
+//        /*
+//         * limpa Movimentos selecionados
+//         */
+//        hideMovimentosPossiveis();
+//        if (getTabuleiro().getCasas()[x][y].isCasaPossivel()
+//                && getTabuleiro().getCasas()[x][y].getPedra() != null
+//                && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
+//            /*
+//             * seta como selecionada a casa, pintando sua borda
+//             */
+//            getTabuleiro().getCasas()[x][y].setCasaSelecionada(true, Color.black);
+//            setOldX(x);
+//            setOldY(y);
+//            analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
+//        }
+//    }
     /*
      * Metodo Distribuit Pedras e responsalvel por colocar na mao dos jogores
      * suas respectivas pedras
      */
-
     public void distribuirPedras() {
         for (int i = 1; i <= 12; i++) {
-            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white, pecaClara));
+            getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white));
         }
         for (int i = 13; i <= 24; i++) {
-            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.black, pecaEscura));
+            getJogadores()[1].addPedra(new Peca(getJogadores()[1].getId(), i, Color.black));
         }
     }
 
@@ -424,22 +573,28 @@ public class Jogo extends JFrame implements ServicoCliente {
      * Caso a casa de destino seja a primeira linha superior (posicao 0 do array) ou inferior (posicao 7 do array)
      * O metodo promovePedra eh chamado.
      */
-    private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+
+private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setImagem(getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].getPedra().getImagem());
-//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].setImagem(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getImagemAreaCasa());
-        try {
-            cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
-                    + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
-                    + String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem));
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
-        }
         if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
             setDama(linhaCasaDestino, colunaCasaDestino);
         }
     }
+//    private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
+//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
+//        try {
+//            cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
+//                    + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
+//                    + String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem));
+//        } catch (IOException ex) {
+//            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
+//        }
+//        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
+//            setDama(linhaCasaDestino, colunaCasaDestino);
+//        }
+//    }
 
     private void hideCasaSelecionada() {
         /*
@@ -460,18 +615,26 @@ public class Jogo extends JFrame implements ServicoCliente {
     /*
      * remove e pedra
      */
+
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
-//        getTabuleiro().getCasas()[x][y].setImagem(getTabuleiro().getCasas()[x][y].getImagemAreaCasa());
+//        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
         getPlacar().atualizarPlacar();
         getPlacar().verificaVencedor(this);
-        try {
-            cliente.enviaMensagem(String.valueOf(x) + "," + String.valueOf(y));
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
-        }
     }
+
+//    private void retiraPeca(int x, int y) {
+//        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
+//        getTabuleiro().getCasas()[x][y].retiraPedra();
+//        getPlacar().atualizarPlacar();
+//        getPlacar().verificaVencedor(this);
+//        try {
+//            cliente.enviaMensagem(String.valueOf(x) + "," + String.valueOf(y));
+//        } catch (IOException ex) {
+//            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
+//        }
+//    }
 
     /*
      * Metodo criado para desmarcar as casas possiveis selecionadas.
