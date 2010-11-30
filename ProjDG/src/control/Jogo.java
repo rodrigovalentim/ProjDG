@@ -47,7 +47,7 @@ public class Jogo extends JFrame implements ServicoCliente {
         /*
          * Colocando titulo na tela principal
          */
-        super("Faculdade Jorge Amado - Jogo de Damas - Davi Sande | Rodrigo Valentim | Ueber Lima");
+        setUndecorated(true);
         imagem = new ImagemLoad().imageLoader(fundo);
         final JDesktopPane guiDamas = new JDesktopPane() {
 
@@ -80,50 +80,22 @@ public class Jogo extends JFrame implements ServicoCliente {
          */
         JMenuBar menu = new JMenuBar();
         setJMenuBar(menu);
-
-        JMenu menuJogo = new JMenu("Jogo");
-        menuJogo.setMnemonic('J');
-
-        menuJogo.addSeparator();
-
-        JMenuItem mItemNovo = new JMenuItem("Jogo Local");
-        mItemNovo.setMnemonic('N');
-        mItemNovo.addActionListener(
-                new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                    }
-                });
-        menuJogo.add(mItemNovo);
-        menuJogo.addSeparator();
-
-        JMenuItem mItemSair = new JMenuItem("Sair");
-        mItemSair.setMnemonic('S');
-        mItemSair.addActionListener(
-                new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                        dispose();
-                        System.exit(0);
-                    }
-                });
-        menuJogo.add(mItemSair);
-        menu.add(menuJogo);
         JMenu menuConexao = new JMenu("Conexão");
-        menuJogo.setMnemonic('C');
         JMenuItem mItemServidor = new JMenuItem("Iniciar Servidor");
         mItemServidor.setMnemonic('S');
         mItemServidor.addActionListener(
                 new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
-                        new Servico().iniciaServidor();
+                        new Servico(false).iniciaServidor();
+
+                        iniciaCliente(guiDamas, jogador1, jogador2, "localhost");
                     }
                 });
         menuConexao.add(mItemServidor);
-
         JMenuItem mItemCliente = new JMenuItem("Iniciar Cliente");
         mItemCliente.setMnemonic('C');
+        menuConexao.addSeparator();
         mItemCliente.addActionListener(
                 new ActionListener() {
 
@@ -136,9 +108,23 @@ public class Jogo extends JFrame implements ServicoCliente {
                     }
                 });
         menuConexao.add(mItemCliente);
-        menuConexao.addSeparator();
         menu.add(menuConexao);
+        JMenu menuJogo = new JMenu("Jogo");
+        menuJogo.setMnemonic('J');
 
+        JMenuItem mItemSair = new JMenuItem("Sair");
+        mItemSair.setMnemonic('S');
+        mItemSair.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        dispose();
+                        System.exit(0);
+                    }
+                });
+        menuJogo.add(mItemSair);
+        menuJogo.setMnemonic('C');
+        menu.add(menuJogo);
         this.setOldX(-1);
         this.setOldY(-1);
         setJogadorDaVez(0); //Jogador da Vez - Inicia com o jogador 0
@@ -152,13 +138,13 @@ public class Jogo extends JFrame implements ServicoCliente {
             try {
                 cliente = new Cliente(this);
                 cliente.iniciaCliente(ip, 1235);
-                tabuleiro = new Tabuleiro();
                 placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
+                tabuleiro = new Tabuleiro();
                 distribuirPedras();
                 posicionarPedras(getJogadores()[jogador1.getId()]);
                 posicionarPedras(getJogadores()[jogador2.getId()]);
-                getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
                 getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
+                getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
                 /*
                  * Inicializando Listener para ouvir o click do mouse
                  */
@@ -573,8 +559,7 @@ public class Jogo extends JFrame implements ServicoCliente {
      * Caso a casa de destino seja a primeira linha superior (posicao 0 do array) ou inferior (posicao 7 do array)
      * O metodo promovePedra eh chamado.
      */
-
-private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
+    private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
         getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
         getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
         if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
@@ -615,7 +600,6 @@ private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestin
     /*
      * remove e pedra
      */
-
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();

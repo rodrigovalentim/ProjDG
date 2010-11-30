@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 import model.Pedra;
 
 /*
@@ -34,7 +35,6 @@ public class Tabuleiro extends JInternalFrame {
          * Adicionando o "escutador" de eventos do mouse.
          * com isso e possivel pegar os clicks do mesmo e saber quais pecas estao querendo movimentar
          */
-
         /*
          * getContentPane - retorna o conteudo do painel para esse frame
          * assim o metodo setTabuleiroContainer podera pegar o conteudo do
@@ -77,7 +77,6 @@ public class Tabuleiro extends JInternalFrame {
         setCorCasaClara(new Color(255, 240, 225));
         setCorCasaEscura(new Color(145, 72, 0));
         pedrasCapturadas = new ArrayList<Pedra>();
-        System.out.println(this.getWidth() + "" + this.getHeight());
         setId(0);
         this.casas = new Casa[8][8];
         /*
@@ -111,8 +110,9 @@ public class Tabuleiro extends JInternalFrame {
                 adicionaComponente(getCasas()[linha][coluna], linha, coluna);
             }
         }
-        setTitle("Tabuleiro"); //Titulo do Tabuleiro
         setSize(600, 520); //Size do do tabuleiro
+        ((BasicInternalFrameUI) this.getUI()).setNorthPane(null); //retirar o painel superior
+        this.setBorder(null);//retirar bordas
     }
 
     /*
@@ -136,8 +136,8 @@ public class Tabuleiro extends JInternalFrame {
      * Exibe esta classe em forma grafica no container principal
      */
     public void mostra(JDesktopPane main) {
-        main.add(this);
         setOpaque(true);
+        main.add(this);
         show();
     }
 
