@@ -81,7 +81,7 @@ public class Placar extends JInternalFrame {
     public void atualizarPlacar(int jogadorVez) {
         if (getJogador1().getId() == jogadorVez) {
             if (getJogador1().getPontos() > 0) {
-                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraclaramini.png")));
+                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraescuramini.png")));
                 getPainelPlacar().add(img);
                 if (getJogador1().getPontos() <= 6) {
                     System.out.println(" Jogador1 " + getJogador1().getPontos() * 20);
@@ -93,7 +93,7 @@ public class Placar extends JInternalFrame {
             }
         } else {
             if (getJogador2().getPontos() > 0) {
-                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraescuramini.png")));
+                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraclaramini.png")));
                 getPainelPlacar().add(img);
                 if (getJogador2().getPontos() <= 6) {
                     System.out.println(" Jogador1 " + (250 + (getJogador2().getPontos() * 20)));
