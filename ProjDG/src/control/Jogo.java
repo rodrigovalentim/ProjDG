@@ -12,6 +12,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import networkgame.clienteserver.Cliente;
 import networkgame.clienteserver.ServicoCliente;
 import networkgame.servidor.Servico;
+import service.Chat;
 import service.Jogador;
 import service.Peca;
 import service.Placar;
@@ -34,14 +37,17 @@ public class Jogo extends JFrame implements ServicoCliente {
     private Jogador[] jogadores;
     private Tabuleiro tabuleiro;
     private Placar placar;
+    private Chat chat;
     private static final int valAjusteClick = 10;
     private boolean novaJogada;
     private int jogadorDaVez;
     private int oldX;
     private int oldY;
     private Cliente cliente;
+    private int idPlayer;
     private static BufferedImage imagem;
     private final String fundo = "imagem/backgroundFloor.png";
+    private boolean reAnaliseMovimento = false;
 
     public Jogo(final Jogador jogador1, final Jogador jogador2) {
         /*
@@ -88,7 +94,7 @@ public class Jogo extends JFrame implements ServicoCliente {
 
                     public void actionPerformed(ActionEvent e) {
                         new Servico(false).iniciaServidor();
-
+                        setIdPlayer(0);
                         iniciaCliente(guiDamas, jogador1, jogador2, "localhost");
                     }
                 });
@@ -104,7 +110,18 @@ public class Jogo extends JFrame implements ServicoCliente {
                                 "Informe o IP/HOST do Servidor",
                                 "Endereco do Servidor",
                                 JOptionPane.QUESTION_MESSAGE);
+                        setIdPlayer(1);
                         iniciaCliente(guiDamas, jogador1, jogador2, ip);
+                    }
+                });
+        menuConexao.add(mItemCliente);
+        JMenuItem mItemMsg = new JMenuItem("Enviar Mensagem");
+        mItemMsg.setMnemonic('M');
+        menuConexao.addSeparator();
+        mItemMsg.addActionListener(
+                new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
                     }
                 });
         menuConexao.add(mItemCliente);
@@ -140,9 +157,11 @@ public class Jogo extends JFrame implements ServicoCliente {
                 cliente.iniciaCliente(ip, 1235);
                 placar = new Placar(getJogadores()[jogador1.getId()], getJogadores()[jogador2.getId()]);
                 tabuleiro = new Tabuleiro();
+                setChat(new Chat());
                 distribuirPedras();
                 posicionarPedras(getJogadores()[jogador1.getId()]);
                 posicionarPedras(getJogadores()[jogador2.getId()]);
+//                getChat().mostra(guiDamas);
                 getPlacar().mostra(guiDamas); //Exibe o placar na tela principal
                 getTabuleiro().mostra(guiDamas); //Exibe o tabuleiro na tela principal
                 /*
@@ -175,11 +194,74 @@ public class Jogo extends JFrame implements ServicoCliente {
     }
 
     public void capturaMensagem(String mensagem) {
+        System.out.println("Mensagem " + mensagem);
+
         String[] dados = mensagem.split(",");
+
+//        System.out.println("Tamanho do Dados " + dados.length);
+//        if (dados[0].compareTo("MOVE") == 0) {
+//            move(Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3]), Integer.parseInt(dados[4]));
+//        }
+//
+//        if (dados[0].compareTo("OLD") == 0) {
+//            setOldX(Integer.parseInt(dados[1]));
+//            setOldY(Integer.parseInt(dados[2]));
+//        }
+//
+//        if (dados[0].compareTo("MUDAJOGADOR") == 0) {
+//            mudarJogadorVez();
+//        }
+//
+//        if (dados[0].compareTo("ANALISTATIPOMOVIMENTO") == 0) {
+//            analistaTipoMovimento(Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), reAnaliseMovimento);
+//        }
+//        System.out.println(dados[0]);
+//        if (dados[0].compareTo("HIDECASASELECIONADA") == 0) {
+//            hideCasaSelecionada();
+//        }
+//
+//        if (dados[0].compareTo("HIDEMOVIMENTOSPOSSIVEIS") == 0) {
+//            hideMovimentosPossiveis();
+//        }
+//
+//        if (dados[0].compareTo("SETCASASELECIONADA") == 0) {
+//            getTabuleiro().getCasas()[Integer.parseInt(dados[1])][Integer.parseInt(dados[2])].setCasaSelecionada(true, Color.black);
+//        }
+//        if (dados[0].compareTo("NOVAJOGADA") == 0 && dados[0].compareTo("TRUE") == 0) {
+//            novaJogada = true;
+//        } else {
+//            if (dados[0].compareTo("NOVAJOGADA") == 0 && dados[0].compareTo("false") == 0) {
+//                novaJogada = false;
+//            }
+//        }
+//
+//        if (dados[0].compareTo("REANALISEMOVIMENTO") == 0 && dados[1].compareTo("TRUE") == 0) {
+//            reAnaliseMovimento = true;
+//        } else {
+//            if (dados[0].compareTo("REANALISEMOVIMENTO") == 0 && dados[1].compareTo("FALSE") == 0) {
+//                reAnaliseMovimento = false;
+//            }
+//        }
+//
+//        if (dados[0].compareTo("RETIRAPECA") == 0) {
+//            try {
+//                retiraPeca(Integer.parseInt(dados[1]), Integer.parseInt(dados[2]));
+//            } catch (IOException ex) {
+//                Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+
         movimentoServidor(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
+
+//        if (dados.length == 1) {
+//            System.out.println("jogador da vez - Atualizando " + getJogadorDaVez());
+//            setJogadorDaVez(Integer.parseInt(dados[0]));
+//            System.out.println("jogador da vez - Atualizado " + getJogadorDaVez());
+//        }
     }
 
-    private void executaJogada(int getX, int getY) {
+    private void executaJogada(int getX, int getY) throws IOException {
+//        System.out.println("Id do player " + getIdPlayer() + " - " + getJogadorDaVez());
         /*
          * Evento que dispara quando o botao do mouse e solto.
          *
@@ -207,14 +289,22 @@ public class Jogo extends JFrame implements ServicoCliente {
         /*
          * Variavel abaixo usada para configurar a reanalise dos movimentos
          */
-        boolean reAnaliseMovimento = false;
+//        cliente.enviaMensagem("REANALISEMOVIMENTO" + "," + "FALSE");
+        reAnaliseMovimento = false;
         /*
          * Metodo set da rotina que configura novaJogada
          */
+//        cliente.enviaMensagem("NOVAJOGADA" + "," + "FALSE");
         setNovaJogada(false);
         /*
          * Rotina abaixo remover que foram "comidas" pelo adversario
          */
+//        System.out.println("x" + x + "y" + y);
+//        if (getTabuleiro().getCasas()[x][y].isMovimentoPossivel()) {
+//            System.out.println("Casa Movimento possivel");
+//        } else {
+//            System.out.println("Casa Movimento Não possivel");
+//        }
         if (getTabuleiro().getCasas()[x][y].isMovimentoPossivel()) {
             /*
              * Calculo usado para saber se o movimento realizado foi de mais de uma casa
@@ -227,6 +317,7 @@ public class Jogo extends JFrame implements ServicoCliente {
                             && l < x
                             && c < y) {
                         if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            cliente.enviaMensagem("RETIRAPECA" + "," + l + "," + c);
                             retiraPeca(l, c);
                         }
                     }
@@ -238,6 +329,7 @@ public class Jogo extends JFrame implements ServicoCliente {
                             && l < x
                             && c > y) {
                         if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            cliente.enviaMensagem("RETIRAPECA" + "," + l + "," + c);
                             retiraPeca(l, c);
                         }
                     }
@@ -249,6 +341,7 @@ public class Jogo extends JFrame implements ServicoCliente {
                             && l > x
                             && c < y) {
                         if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            cliente.enviaMensagem("RETIRAPECA" + "," + l + "," + c);
                             retiraPeca(l, c);
                         }
                     }
@@ -260,6 +353,7 @@ public class Jogo extends JFrame implements ServicoCliente {
                             && l > x
                             && c > y) {
                         if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
+//                            cliente.enviaMensagem("RETIRAPECA" + "," + l + "," + c);
                             retiraPeca(l, c);
                         }
                     }
@@ -267,57 +361,74 @@ public class Jogo extends JFrame implements ServicoCliente {
                 /*
                  * Rotina de movimentacao da peca, da origem pro destino
                  */
+//                cliente.enviaMensagem("MOVE" + getOldX() + "," + getOldY() + "," + x + "," + y);
                 move(getOldX(), getOldY(), x, y);
+//                cliente.enviaMensagem("OLD" + "," + x + "," + y);
                 setOldX(x);
                 setOldY(y);
+//                cliente.enviaMensagem("REANALISEMOVIMENTO" + "," + "TRUE");
                 reAnaliseMovimento = true;
                 /*
                  * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
                  */
+//                cliente.enviaMensagem("ANALISTATIPOMOVIMENTO" + "," + x + "," + y);
                 analistaTipoMovimento(x, y, reAnaliseMovimento);
             } else {
                 /*
                  * Simples rotina de movimento, sem acao de comer
                  */
+//                cliente.enviaMensagem("MOVE" + "," + getOldX() + "," + getOldY() + "," + x + "," + y);
                 move(getOldX(), getOldY(), x, y);
             }
             /*
              * Controla vez do jgoador
              */
             if (!isNovaJogada()) {
+//                cliente.enviaMensagem("MUDAJOGADOR");
                 mudarJogadorVez();
+//                cliente.enviaMensagem("REANALISEMOVIMENTO" + "," + "FALSE");
                 reAnaliseMovimento = false;
             }
         }
         /*
          * Limpa casas selecionads
          */
+//        cliente.enviaMensagem("HIDECASASELECIONADA");
         hideCasaSelecionada();
         /*
          * limpa Movimentos selecionados
          */
+//        cliente.enviaMensagem("HIDEMOVIMENTOSPOSSIVEIS");
         hideMovimentosPossiveis();
-
+//
         if (getTabuleiro().getCasas()[x][y].isCasaPossivel()
                 && getTabuleiro().getCasas()[x][y].getPedra() != null
+                && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getIdPlayer()
                 && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
             /*
              * seta como selecionada a casa, pintando sua borda
              */
+//            cliente.enviaMensagem("SETCASASELECIONADA" + "," + x + "," + y);
             getTabuleiro().getCasas()[x][y].setCasaSelecionada(true, Color.black);
+//            cliente.enviaMensagem("OLD" + "," + x + "," + y);
             setOldX(x);
             setOldY(y);
+//            cliente.enviaMensagem("ANALISTATIPOMOVIMENTO" + "," + getOldX() + "," + getOldY());
             analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
         }
     }
 
     private void movimentoServidor(int getX, int getY) {
-        executaJogada(getX, getY);
+        try {
+            executaJogada(getX, getY);
+        } catch (IOException ex) {
+            Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void capturaClicks(MouseEvent e) {
-        executaJogada(e.getX(), e.getY());
         try {
+            executaJogada(e.getX(), e.getY());
             cliente.enviaMensagem(String.valueOf(e.getX()) + "," + String.valueOf(e.getY()));
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
@@ -327,6 +438,7 @@ public class Jogo extends JFrame implements ServicoCliente {
      * Metodo Distribuit Pedras e responsalvel por colocar na mao dos jogores
      * suas respectivas pedras
      */
+
     public void distribuirPedras() {
         for (int i = 1; i <= 12; i++) {
             getJogadores()[0].addPedra(new Peca(getJogadores()[0].getId(), i, Color.white));
@@ -428,7 +540,7 @@ public class Jogo extends JFrame implements ServicoCliente {
     /*
      * remove e pedra
      */
-    private void retiraPeca(int x, int y) {
+    private void retiraPeca(int x, int y) throws IOException {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
         getPlacar().atualizarPlacar(getJogadorDaVez());
@@ -439,6 +551,7 @@ public class Jogo extends JFrame implements ServicoCliente {
      * Metodo criado para desmarcar as casas possiveis selecionadas.
      */
     private void hideMovimentosPossiveis() {
+//        System.out.println("Limpando movimentos possiveis " + getJogadorDaVez() + " " + getIdPlayer());
         for (int linha = 0; linha < 8; linha++) {
             for (int coluna = 0; coluna < 8; coluna++) {
                 getTabuleiro().getCasas()[coluna][linha].setMovimentoPossivel(false, getTabuleiro().getCorCasaEscura());
@@ -795,5 +908,38 @@ public class Jogo extends JFrame implements ServicoCliente {
         } else {
             setJogadorDaVez(1);
         }
+//        try {
+//            cliente.enviaMensagem(String.valueOf(getJogadorDaVez()));
+//        } catch (IOException ex) {
+//            Logger.getLogger(Jogo.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }
+
+    /**
+     * @return the chat
+     */
+    public Chat getChat() {
+        return chat;
+    }
+
+    /**
+     * @param chat the chat to set
+     */
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
+
+    /**
+     * @return the idPlayer
+     */
+    public int getIdPlayer() {
+        return idPlayer;
+    }
+
+    /**
+     * @param idPlayer the idPlayer to set
+     */
+    public void setIdPlayer(int idPlayer) {
+        this.idPlayer = idPlayer;
     }
 }
