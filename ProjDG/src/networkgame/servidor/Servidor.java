@@ -1,17 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package networkgame.servidor;
 
 import exception.FilaVaziaException;
 import java.io.IOException;
 
-/**
- *
- * @author Davi Sande
- */
 public class Servidor {
     private ServidorIni servidorIni;
 

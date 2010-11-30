@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package estruturas;
 
 import exception.PilhaVaziaException;
 
-/**
- *
- * @author Davi Sande
- */
 public class Pilha {
 
     private Object[] vetor;

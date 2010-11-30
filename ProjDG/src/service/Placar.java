@@ -1,7 +1,5 @@
 package service;
 
-import estruturas.Pilha;
-import exception.PilhaVaziaException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;

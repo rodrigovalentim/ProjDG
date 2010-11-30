@@ -7,10 +7,6 @@ import java.awt.Toolkit;
 import javax.swing.UIManager;
 import service.Jogador;
 
-/**
- *
- * @author rodrigo.valentim
- */
 public class Damas {
 
     private static Jogador jogador1, jogador2;

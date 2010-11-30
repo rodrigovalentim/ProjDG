@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gui;
 
 import estruturas.Pilha;
@@ -12,10 +8,6 @@ import javax.swing.ImageIcon;
 import utils.ImagemLoad;
 import utils.ToImageIcon;
 
-/**
- *
- * @author rodrigo.valentim
- */
 public class Splash {
 
     SplashScreen screen;

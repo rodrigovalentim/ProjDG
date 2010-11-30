@@ -8,13 +8,10 @@
 package control;
 
 import exception.ListaVaziaException;
-import exception.PilhaVaziaException;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -326,164 +323,6 @@ public class Jogo extends JFrame implements ServicoCliente {
             JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
         }
     }
-//    public void capturaMensagem(String mensagem) {
-//        String[] dados = mensagem.split(",");
-//        if (dados.length > 2) {
-//            setOldX(Integer.parseInt(dados[4]));
-//            setOldY(Integer.parseInt(dados[5]));
-//            servidorMove(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]), Integer.parseInt(dados[2]), Integer.parseInt(dados[3]));
-//            mudarJogadorVez();
-//        } else {
-//            servidorRetiraPeca(Integer.parseInt(dados[0]), Integer.parseInt(dados[1]));
-//        }
-//    }
-
-//    private void servidorMove(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
-//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
-//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-//        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
-//            setDama(linhaCasaDestino, colunaCasaDestino);
-//        }
-//    }
-//
-//    private void servidorRetiraPeca(int x, int y) {
-//        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
-//        getTabuleiro().getCasas()[x][y].retiraPedra();
-//        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
-//        getPlacar().atualizarPlacar();
-//        getPlacar().verificaVencedor(this);
-//    }
-//
-//    public void capturaClicks(MouseEvent e) {
-//        /*
-//         * Evento que dispara quando o botao do mouse e solto.
-//         *
-//         * super.getWidth serve para pegar a largura do componente
-//         *
-//         * super.getHeight serve para pegar a altura do componente
-//         *
-//         * A divisao por 8 e necessaria por que temos 8 casas
-//         *
-//         * Y esta recebendo testaMovimentos e X esta recebendo Y por que o mouseEvent interte isso, pra nos ajudar, claro.
-//         * Atraves destes testes, leitura de documentacoes
-//         * http://download.oracle.com/javase/1.4.2/docs/api/java/awt/event/MouseEvent.html
-//         * indentificamos que o MouseEvent retorna X como sendo linha e o Y como sendo coluna.
-//         * Invertendo as posicoes, tudo se resolveu.
-//         *
-//         *
-//         * O valor de ajuste igual a 20, quando subtraido da linha, temos uma maior precisao
-//         * no calculo nos possibilitando clicar bem proximo da borda da casa sem que ele pegue
-//         * a casa errada. Sem esse valor de ajuste, ao nos aproximarmos das bordas, ele pegava a casa vizinha.
-//         *
-//         */
-//        int y = (e.getX()) / (getTabuleiro().getWidth() / 8);
-//        int x = (e.getY() - valAjusteClick) / (getTabuleiro().getHeight() / 8);
-//
-//        /*
-//         * Variavel abaixo usada para configurar a reanalise dos movimentos
-//         */
-//        boolean reAnaliseMovimento = false;
-//        /*
-//         * Metodo set da rotina que configura novaJogada
-//         */
-//        setNovaJogada(false);
-//        /*
-//         * Rotina abaixo remover que foram "comidas" pelo adversario
-//         */
-//        if (getTabuleiro().getCasas()[x][y].isMovimentoPossivel()) {
-//            /*
-//             * Calculo usado para saber se o movimento realizado foi de mais de uma casa
-//             * Caso posivito, entra na rotina de analise de possiveis pecas comidas
-//             */
-//            if (Math.abs(getOldY() - y) >= 2) {
-//                int l = getOldX(), c = getOldY();
-//                if (x > l && y > c) {
-//                    while (getTabuleiro().getCasas()[l++][c++].isCasaPossivel()
-//                            && l < x
-//                            && c < y) {
-//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
-//                            retiraPeca(l, c);
-//                        }
-//                    }
-//                }
-//                l = getOldX();
-//                c = getOldY();
-//                if (x > l && y < c) {
-//                    while (getTabuleiro().getCasas()[l++][c--].isCasaPossivel()
-//                            && l < x
-//                            && c > y) {
-//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
-//                            retiraPeca(l, c);
-//                        }
-//                    }
-//                }
-//                l = getOldX();
-//                c = getOldY();
-//                if (x < l && y > c) {
-//                    while (getTabuleiro().getCasas()[l--][c++].isCasaPossivel()
-//                            && l > x
-//                            && c < y) {
-//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
-//                            retiraPeca(l, c);
-//                        }
-//                    }
-//                }
-//                l = getOldX();
-//                c = getOldY();
-//                if (x < l && y < c) {
-//                    while (getTabuleiro().getCasas()[l--][c--].isCasaPossivel()
-//                            && l > x
-//                            && c > y) {
-//                        if (getTabuleiro().getCasas()[l][c].getPedra() != null) {
-//                            retiraPeca(l, c);
-//                        }
-//                    }
-//                }
-//                /*
-//                 * Rotina de movimentacao da peca, da origem pro destino
-//                 */
-//                move(getOldX(), getOldY(), x, y);
-//                setOldX(x);
-//                setOldY(y);
-//                reAnaliseMovimento = true;
-//                /*
-//                 * Re analisa os movimentos para saber se e possivel comer mais pedras antes de parar
-//                 */
-//                analistaTipoMovimento(x, y, reAnaliseMovimento);
-//            } else {
-//                /*
-//                 * Simples rotina de movimento, sem acao de comer
-//                 */
-//                move(getOldX(), getOldY(), x, y);
-//            }
-//            /*
-//             * Controla vez do jgoador
-//             */
-//            if (!isNovaJogada()) {
-//                mudarJogadorVez();
-//                reAnaliseMovimento = false;
-//            }
-//        }
-//        /*
-//         * Limpa casas selecionads
-//         */
-//        hideCasaSelecionada();
-//        /*
-//         * limpa Movimentos selecionados
-//         */
-//        hideMovimentosPossiveis();
-//        if (getTabuleiro().getCasas()[x][y].isCasaPossivel()
-//                && getTabuleiro().getCasas()[x][y].getPedra() != null
-//                && getTabuleiro().getCasas()[x][y].getPedra().getIdOwner() == getJogadorDaVez()) {
-//            /*
-//             * seta como selecionada a casa, pintando sua borda
-//             */
-//            getTabuleiro().getCasas()[x][y].setCasaSelecionada(true, Color.black);
-//            setOldX(x);
-//            setOldY(y);
-//            analistaTipoMovimento(getOldX(), getOldY(), reAnaliseMovimento);
-//        }
-//    }
     /*
      * Metodo Distribuit Pedras e responsalvel por colocar na mao dos jogores
      * suas respectivas pedras
@@ -569,20 +408,6 @@ public class Jogo extends JFrame implements ServicoCliente {
             setDama(linhaCasaDestino, colunaCasaDestino);
         }
     }
-//    private void move(int linhaCasaOrigem, int colunaCasaOrigem, int linhaCasaDestino, int colunaCasaDestino) {
-//        getTabuleiro().getCasas()[linhaCasaDestino][colunaCasaDestino].setPedra(getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].getPedra());
-//        getTabuleiro().getCasas()[linhaCasaOrigem][colunaCasaOrigem].retiraPedra();
-//        try {
-//            cliente.enviaMensagem(String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem) + ","
-//                    + String.valueOf(linhaCasaDestino) + "," + String.valueOf(colunaCasaDestino) + ","
-//                    + String.valueOf(linhaCasaOrigem) + "," + String.valueOf(colunaCasaOrigem));
-//        } catch (IOException ex) {
-//            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
-//        }
-//        if (((getJogadorDaVez() == 0) && (linhaCasaDestino == 7)) || ((getJogadorDaVez() == 1) && (linhaCasaDestino == 0))) {
-//            setDama(linhaCasaDestino, colunaCasaDestino);
-//        }
-//    }
 
     private void hideCasaSelecionada() {
         /*
@@ -609,18 +434,6 @@ public class Jogo extends JFrame implements ServicoCliente {
         getPlacar().atualizarPlacar(getJogadorDaVez());
         getPlacar().verificaVencedor(this);
     }
-
-//    private void retiraPeca(int x, int y) {
-//        getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
-//        getTabuleiro().getCasas()[x][y].retiraPedra();
-//        getPlacar().atualizarPlacar();
-//        getPlacar().verificaVencedor(this);
-//        try {
-//            cliente.enviaMensagem(String.valueOf(x) + "," + String.valueOf(y));
-//        } catch (IOException ex) {
-//            JOptionPane.showMessageDialog(this, "Erro ao enviar mensagem ao servidor");
-//        }
-//    }
 
     /*
      * Metodo criado para desmarcar as casas possiveis selecionadas.

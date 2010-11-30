@@ -3,6 +3,6 @@ package networkgame.exception;
 public class FilaVaziaException extends Exception{
 	
 	public FilaVaziaException(){
-		super("Não há dados da fila.");
+		super("Nao ha dados da fila.");
 	}
 }

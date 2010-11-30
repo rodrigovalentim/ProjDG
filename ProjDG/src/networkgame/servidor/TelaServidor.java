@@ -1,14 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * TelaServidor.java
- *
- * Created on 04/11/2010, 12:04:51
- */
-
 package networkgame.servidor;
 
 import exception.FilaVaziaException;
@@ -16,10 +5,6 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-/**
- *
- * @author Davi
- */
 public class TelaServidor extends javax.swing.JFrame {
     Servico servico;
 
