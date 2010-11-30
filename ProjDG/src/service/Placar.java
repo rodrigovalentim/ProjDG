@@ -1,17 +1,17 @@
 package service;
 
+import estruturas.Pilha;
+import exception.PilhaVaziaException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 import utils.ImagemLoad;
 import utils.ToImageIcon;
@@ -20,45 +20,39 @@ public class Placar extends JInternalFrame {
 
     private Jogador jogador1;
     private Jogador jogador2;
-    private JTextArea resultado;
-    private String mensagem;
     private String placarImagem = "imagem/placar_imagem.png";
     private BufferedImage imagem;
-    private JPanel p1, p2;
-    private JLabel img2;
+    private JPanel painelPlacar;
+    private JLabel img;
+    private Pilha pilhaPlayer1, pilhaPlayer2;
 
     public Placar(Jogador jogador1, Jogador jogador2) {
         setJogador1(jogador1);
         setJogador2(jogador2);
+        pilhaPlayer1 = new Pilha();
+        pilhaPlayer2 = new Pilha();
+        populaPilhas();
         setBounds(600, 0, 170, 400);
-        setBackground(new Color(0, 0, 0, 0));
-        resultado = new JTextArea();
-        atualizarPlacar();
-        mensagem = "";
         imagem = new ImagemLoad().imageLoader(placarImagem);
-        setP1(new JPanel(new GridLayout(1, 24)));
-        getP1().setBounds(600, 10, 10, 10);
-        getP1().setBounds(600, 400, 10, 10);
-        getP1().setBackground(new Color(0,0,0,0));
-        img2 = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraclaramini.png")));
-        getP1().add(img2,0);
-        getP1().add(new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraclaramini.png"))),10);
+        setBackground(new Color(0, 0, 0, 0)); //fundo transparente
+        painelPlacar = new JPanel();
+        painelPlacar.setLayout(null);
+        painelPlacar.setBackground(new Color(0, 0, 0, 0)); //fundo transparente
+        add(painelPlacar);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.add(getP1());
         Graphics2D graphics2D = (Graphics2D) g.create();
         graphics2D.drawImage(imagem, 0, 0, this);
         ((BasicInternalFrameUI) this.getUI()).setNorthPane(null); //retirar o painel superior
         setBorder(null); //removendo borda
-        
     }
-
     /*
      * Metodo mostra torna possivel exibir este objeto grafico no frame principal.
      */
+
     public void mostra(JDesktopPane main) {
         setOpaque(false);
         main.add(this);
@@ -90,35 +84,50 @@ public class Placar extends JInternalFrame {
         }
     }
 
-    public void atualizarPlacar() {
-        resultado.setText(jogador1.getNome() + " = " + jogador1.getPontos() + "\n" + jogador2.getNome() + " = " + jogador2.getPontos());
+    public void atualizarPlacar() throws PilhaVaziaException {
+        if (getJogador2().getPontos() > 0) {
+            System.out.println("getjogador2");
+            img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader((String) pilhaPlayer1.desempilhar())));
+            getPainelPlacar().add(img);
+            if (getJogador2().getPontos() <= 6) {
+                img.setBounds(2, getJogador2().getPontos() * 20, 20, 20);
+            } else {
+                if (getJogador2().getPontos() >= 7) {
+                    img.setBounds(22, (getJogador2().getPontos() - 6) * 20, 20, 20);
+                }
+            }
+        } else {
+            System.out.println("getjogador1");
+            img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader((String) pilhaPlayer2.desempilhar())));
+            getPainelPlacar().add(img);
+            if (getJogador1().getPontos() <= 6) {
+                img.setBounds(2, (getJogador1().getPontos() * 200), 20, 20);
+            } else {
+                if (getJogador1().getPontos() >= 7) {
+                    img.setBounds(22, ((getJogador1().getPontos() - 6) * 10) * 2, 20, 20);
+                }
+            }
+        }
+    }
+
+    private void populaPilhas() {
+        for (int a = 12; a >= 0; a--) {
+            pilhaPlayer1.empilhar("imagem/pedraclaramini.png");
+            pilhaPlayer2.empilhar("imagem/pedraescuramini.png");
+        }
     }
 
     /**
-     * @return the p1
+     * @return the painelPlacar
      */
-    public JPanel getP1() {
-        return p1;
+    public JPanel getPainelPlacar() {
+        return painelPlacar;
     }
 
     /**
-     * @param p1 the p1 to set
+     * @param painelPlacar the painelPlacar to set
      */
-    public void setP1(JPanel p1) {
-        this.p1 = p1;
-    }
-
-    /**
-     * @return the p2
-     */
-    public JPanel getP2() {
-        return p2;
-    }
-
-    /**
-     * @param p2 the p2 to set
-     */
-    public void setP2(JPanel p2) {
-        this.p2 = p2;
+    public void setPainelPlacar(JPanel painelPlacar) {
+        this.painelPlacar = painelPlacar;
     }
 }

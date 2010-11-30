@@ -8,10 +8,13 @@
 package control;
 
 import exception.ListaVaziaException;
+import exception.PilhaVaziaException;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -603,8 +606,10 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
-//        getTabuleiro().getCasas()[x][y].setForeground(getTabuleiro().getCasas()[x][y].getBackground());
-        getPlacar().atualizarPlacar();
+        try {
+            getPlacar().atualizarPlacar();
+        } catch (PilhaVaziaException ex) {
+        }
         getPlacar().verificaVencedor(this);
     }
 

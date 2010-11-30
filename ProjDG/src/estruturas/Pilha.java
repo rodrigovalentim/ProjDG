@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package estruturas;
 
 import exception.PilhaVaziaException;
@@ -12,6 +11,7 @@ import exception.PilhaVaziaException;
  * @author Davi Sande
  */
 public class Pilha {
+
     private Object[] vetor;
     private int qtdDados;
 
@@ -22,16 +22,15 @@ public class Pilha {
     }
 
     //Método para empilhar os dados na pilha (redimensiona duplicando o tamanho da pilha)
-    public void empilhar(Object dado){
-        if(qtdDados < vetor.length){
+    public void empilhar(Object dado) {
+        if (qtdDados < vetor.length) {
             vetor[qtdDados] = dado;
             qtdDados++;
-        }
-        else{
-            if(qtdDados % 50 == 0){
+        } else {
+            if (qtdDados % 50 == 0) {
                 Object[] temp = vetor;
                 vetor = new Object[qtdDados * 2];
-                for(int x = 0; x < temp.length; x++){
+                for (int x = 0; x < temp.length; x++) {
                     vetor[x] = temp[x];
                 }
             }
@@ -41,23 +40,21 @@ public class Pilha {
     }
 
     //Método para desempilhar os dados da pilha
-    public Object desempilhar() throws PilhaVaziaException{
-        if(vazia()){
+    public Object desempilhar() throws PilhaVaziaException {
+        if (vazia()) {
             throw new PilhaVaziaException();
-        }
-        else{
+        } else {
             qtdDados--;
             return vetor[qtdDados];
         }
-        
+
     }
 
     //Método que verifica se a pilha está vazia
-    public boolean vazia(){
-        if(qtdDados == 0){
+    public boolean vazia() {
+        if (qtdDados == 0) {
             return true;
         }
         return false;
     }
-
 }
