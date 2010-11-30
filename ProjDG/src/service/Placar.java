@@ -24,14 +24,10 @@ public class Placar extends JInternalFrame {
     private BufferedImage imagem;
     private JPanel painelPlacar;
     private JLabel img;
-    private Pilha pilhaPlayer1, pilhaPlayer2;
 
     public Placar(Jogador jogador1, Jogador jogador2) {
         setJogador1(jogador1);
         setJogador2(jogador2);
-        pilhaPlayer1 = new Pilha();
-        pilhaPlayer2 = new Pilha();
-        populaPilhas();
         setBounds(600, 0, 170, 400);
         imagem = new ImagemLoad().imageLoader(placarImagem);
         setBackground(new Color(0, 0, 0, 0)); //fundo transparente
@@ -84,36 +80,30 @@ public class Placar extends JInternalFrame {
         }
     }
 
-    public void atualizarPlacar() throws PilhaVaziaException {
-        if (getJogador2().getPontos() > 0) {
-            System.out.println("getjogador2");
-            img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader((String) pilhaPlayer1.desempilhar())));
-            getPainelPlacar().add(img);
-            if (getJogador2().getPontos() <= 6) {
-                img.setBounds(2, getJogador2().getPontos() * 20, 20, 20);
-            } else {
-                if (getJogador2().getPontos() >= 7) {
-                    img.setBounds(22, (getJogador2().getPontos() - 6) * 20, 20, 20);
+    public void atualizarPlacar(int jogadorVez) {
+        if (getJogador1().getId() == jogadorVez) {
+            if (getJogador1().getPontos() > 0) {
+                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraclaramini.png")));
+                getPainelPlacar().add(img);
+                if (getJogador1().getPontos() <= 6) {
+                    System.out.println(" Jogador1 " + getJogador1().getPontos() * 20);
+                    img.setBounds(2, getJogador1().getPontos() * 20, 20, 20);
+                } else {
+                    System.out.println(" Jogador1 " + (getJogador1().getPontos() - 6) * 20);
+                    img.setBounds(22, (getJogador1().getPontos() - 6) * 20, 20, 20);
                 }
             }
         } else {
-            System.out.println("getjogador1");
-            img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader((String) pilhaPlayer2.desempilhar())));
-            getPainelPlacar().add(img);
-            if (getJogador1().getPontos() <= 6) {
-                img.setBounds(2, (getJogador1().getPontos() * 200), 20, 20);
-            } else {
-                if (getJogador1().getPontos() >= 7) {
-                    img.setBounds(22, ((getJogador1().getPontos() - 6) * 10) * 2, 20, 20);
+            if (getJogador2().getPontos() > 0) {
+                img = new JLabel(new ToImageIcon().toImageIcon(new ImagemLoad().imageLoader("imagem/pedraescuramini.png")));
+                getPainelPlacar().add(img);
+                if (getJogador2().getPontos() <= 6) {
+                    System.out.println(" Jogador1 " + (250 + (getJogador2().getPontos() * 20)));
+                    img.setBounds(2, (250 + (getJogador2().getPontos() * 20)), 20, 20);
+                } else {
+                    img.setBounds(22, (250 + ((getJogador2().getPontos()-6) * 20)), 20, 20);
                 }
             }
-        }
-    }
-
-    private void populaPilhas() {
-        for (int a = 12; a >= 0; a--) {
-            pilhaPlayer1.empilhar("imagem/pedraclaramini.png");
-            pilhaPlayer2.empilhar("imagem/pedraescuramini.png");
         }
     }
 

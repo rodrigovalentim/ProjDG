@@ -606,10 +606,7 @@ public class Jogo extends JFrame implements ServicoCliente {
     private void retiraPeca(int x, int y) {
         getJogadores()[getJogadorDaVez()].setPontos(getJogadores()[getJogadorDaVez()].getPontos() + 1);
         getTabuleiro().getCasas()[x][y].retiraPedra();
-        try {
-            getPlacar().atualizarPlacar();
-        } catch (PilhaVaziaException ex) {
-        }
+        getPlacar().atualizarPlacar(getJogadorDaVez());
         getPlacar().verificaVencedor(this);
     }
 

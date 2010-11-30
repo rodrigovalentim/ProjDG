@@ -31,7 +31,7 @@ public class Splash {
         // do something here to simulate the program doing something that
         // is time consuming
         for (int i = 0; i <= 100; i++) {
-            for (long j = 0; j < 300000; ++j) {
+            for (long j = 0; j < 3000; ++j) {
                 String poop = " " + (j + i);
             }
             try {
